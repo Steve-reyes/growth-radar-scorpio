@@ -1,0 +1,15 @@
+services:
+  api:
+    build: ./backend
+    container_name: growth-radar-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - growth_radar_data:/app/data
+      - /root/growth-radar/.env:/app/.env:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+
+volumes:
+  growth_radar_data:

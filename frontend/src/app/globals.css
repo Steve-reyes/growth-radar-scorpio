@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-mono: 'SF Mono', 'Menlo', Monaco, 'Courier New', monospace;
+  --color-ios-blue: #007AFF;
+  --color-ios-green: #34C759;
+  --color-ios-orange: #FF9500;
+  --color-ios-red: #FF3B30;
+  --color-ios-gray: #636366;
+  --color-ios-light-gray: #F2F2F7;
+  --color-ios-dark-bg: #1C1C1E;
+  --color-ios-dark-card: #2C2C2E;
+  --color-ios-dark-nav: #161618;
+}
+
+:root {
+  --background: #F2F2F7;
+  --foreground: #1C1C1E;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #1C1C1E;
+    --foreground: #F2F2F7;
+  }
+}
+
+body {
+  background: var(--background);
+  color: #1C1C1E;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+    'Helvetica Neue', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Header bar */
+.site-header {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .site-header {
+  background: rgba(28, 28, 30, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* iOS pill button */
+.ios-pill {
+  border-radius: 9999px;
+  padding: 10px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: all 0.15s ease;
+}
+
+.ios-pill-primary {
+  background: #007AFF;
+  color: white;
+}
+
+.ios-pill-primary:hover {
+  background: #0066D6;
+}
+
+.ios-pill-secondary {
+  background: rgba(0, 122, 255, 0.1);
+  color: #007AFF;
+}
+
+.ios-pill-secondary:hover {
+  background: rgba(0, 122, 255, 0.18);
+}
+
+/* Score badges */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 3px 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.score-high {
+  background: rgba(52, 199, 89, 0.2);
+  color: #1A8A3A;
+}
+
+.score-mid {
+  background: rgba(255, 149, 0, 0.2);
+  color: #C77600;
+}
+
+.score-low {
+  background: rgba(255, 59, 48, 0.2);
+  color: #C41E1E;
+}
+
+.dark .score-high {
+  color: #34C759;
+  background: rgba(52, 199, 89, 0.2);
+}
+.dark .score-mid {
+  color: #FF9F0A;
+  background: rgba(255, 149, 0, 0.2);
+}
+.dark .score-low {
+  color: #FF453A;
+  background: rgba(255, 69, 58, 0.2);
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 3px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-new { background: rgba(0, 122, 255, 0.15); color: #004BB5; }
+.status-contacted { background: rgba(255, 149, 0, 0.15); color: #B86A00; }
+.status-qualified { background: rgba(52, 199, 89, 0.15); color: #1A6E32; }
+.status-converted { background: rgba(52, 199, 89, 0.15); color: #1A6E32; }
+.status-dismissed { background: rgba(142, 142, 147, 0.25); color: #636366; }
+
+.dark .status-new { color: #64B5FF; }
+.dark .status-contacted { color: #FFB340; }
+.dark .status-qualified { color: #4CD964; }
+.dark .status-converted { color: #4CD964; }
+.dark .status-dismissed { color: #98989D; }
+
+/* Card styles - solid white for readability */
+.ios-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.dark .ios-card {
+  background: #2C2C2E;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Table styles */
+.ios-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ios-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #636366;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.ios-table td {
+  padding: 14px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1C1C1E;
+}
+
+.ios-table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .ios-table tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.ios-table tr:last-child {
+  border-bottom: none;
+}
+
+/* Loading skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #D1D1D6 25%, #E8E8ED 50%, #D1D1D6 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+.dark .skeleton {
+  background: linear-gradient(90deg, #3A3A3C 25%, #2C2C2E 50%, #3A3A3C 75%);
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Modal overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 28px;
+  border-radius: 9999px;
+  font-size: 15px;
+  font-weight: 600;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  animation: toast-in 0.3s ease;
+}
+
+.toast-success { background: #34C759; color: white; }
+.toast-error { background: #FF3B30; color: white; }
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Progress bar for score distribution */
+.score-bar {
+  height: 28px;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+
+/* Input styles */
+.ios-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: white;
+  font-size: 16px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dark .ios-input {
+  background: #3A3A3C;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #F2F2F7;
+}
+
+.ios-input:focus {
+  border-color: #007AFF;
+}
+
+/* Select */
+.ios-select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: white;
+  font-size: 15px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+}
+
+.dark .ios-select {
+  background: #3A3A3C;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #F2F2F7;
+}
