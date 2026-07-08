@@ -1,11 +1,211 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { Territory } from '@/lib/types';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Territory, Lead } from '@/lib/types';
 import { apiGet, apiPost, apiDelete } from '@/lib/api';
 
-export default function TerritoriesPage() {
+function ScoreBadge({ score }: { score: number }) {
+  let cls = 'score-low';
+  if (score > 70) cls = 'score-high';
+  else if (score > 40) cls = 'score-mid';
+  return (
+    <span className="score-mini-bar">
+      <span className={`score-badge ${cls}`}>{score}</span>
+      <span className="score-mini-bar-track">
+        <span className="score-mini-bar-fill" style={{ width: `${score}%`, background: score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444' }} />
+      </span>
+    </span>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  return (
+    <span className={`status-badge status-${status}`}>
+      <span className={`status-dot status-dot-${status}`} />
+      {status}
+    </span>
+  );
+}
+
+function TerritoryLeadsView({ territoryId, onBack }: { territoryId: string; onBack: () => void }) {
+  const [territory, setTerritory] = useState<Territory | null>(null);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sortKey, setSortKey] = useState('business_name');
+  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [filterMinScore, setFilterMinScore] = useState(0);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const [t, leadsData] = await Promise.all([
+          apiGet<Territory>(`/api/territories/${territoryId}`),
+          apiGet<Lead[]>(`/api/leads?territory_id=${territoryId}`),
+        ]);
+        setTerritory(t);
+        setLeads(leadsData);
+      } catch {
+        // territory not found or api error
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [territoryId]);
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  };
+
+  const sortArrow = (key: string) => {
+    if (sortKey !== key) return ' ↕';
+    return sortDir === 'asc' ? ' ↑' : ' ↓';
+  };
+
+  const getVal = (l: Lead, k: string): string | number => {
+    if (k === 'hvac_score') return l.hvac_score;
+    if (k === 'discovered_at') return l.discovered_at || '';
+    return (l as any)[k]?.toLowerCase() || '';
+  };
+
+  const filteredLeads = leads.filter(l => {
+    if (filterStatus && l.status !== filterStatus) return false;
+    if (filterType && l.business_type !== filterType) return false;
+    if (l.hvac_score < filterMinScore) return false;
+    return true;
+  });
+
+  const sortedLeads = [...filteredLeads].sort((a, b) => {
+    const va = getVal(a, sortKey);
+    const vb = getVal(b, sortKey);
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const uniqueTypes = [...new Set(leads.map(l => l.business_type).filter(Boolean))];
+
+  if (loading) {
+    return <div className="space-y-4"><div className="skeleton h-8 w-48 mb-2" /><div className="skeleton h-64 w-full" /></div>;
+  }
+
+  if (!territory) {
+    return (
+      <div className="dark-card p-8 text-center">
+        <p className="text-[#EF4444] font-semibold">Territory not found</p>
+        <button onClick={onBack} className="text-[#10B981] text-sm mt-2 inline-block hover:underline cursor-pointer">Back to territories</button>
+      </div>
+    );
+  }
+
+  const avgScoreColor = territory.avg_score
+    ? territory.avg_score > 70 ? '#10B981' : territory.avg_score > 40 ? '#F59E0B' : '#EF4444'
+    : '#64748B';
+
+  return (
+    <div>
+      <div className="page-breadcrumb mb-2">
+        <button onClick={onBack} className="text-[#10B981] hover:underline cursor-pointer">Territories</button>
+        <span className="page-breadcrumb-sep">/</span>
+        <span className="text-[#94A3B8]">{territory.name}</span>
+      </div>
+
+      <div className="dark-card p-6 mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-[#F1F5F9]">{territory.name}</h1>
+            <p className="text-sm text-[#94A3B8] mt-1">
+              {territory.city}, {territory.province}
+              {territory.postal_code && ` · ${territory.postal_code}`}
+              {territory.radius_km && ` · ${territory.radius_km}km radius`}
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-8 mt-4 pt-4 border-t border-[rgba(148,163,184,0.06)]">
+          <div>
+            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Total Leads</span>
+            <p className="trit-stat-value text-[#F1F5F9] font-mono">{territory.total_leads ?? leads.length}</p>
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Avg Score</span>
+            <p className="trit-stat-value font-mono" style={{ color: avgScoreColor }}>{territory.avg_score?.toFixed(1) ?? '-'}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3 mb-4 items-center">
+        <select className="dark-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+          <option value="">All Statuses</option>
+          <option value="new">New</option>
+          <option value="contacted">Contacted</option>
+          <option value="qualified">Qualified</option>
+          <option value="converted">Converted</option>
+          <option value="dismissed">Dismissed</option>
+        </select>
+        <select className="dark-select" value={filterType} onChange={e => setFilterType(e.target.value)}>
+          <option value="">All Types</option>
+          {uniqueTypes.map(t => <option key={t} value={t!}>{t}</option>)}
+        </select>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[#64748B] font-semibold uppercase tracking-wide">Min Score:</span>
+          <input type="range" min={0} max={100} value={filterMinScore} onChange={e => setFilterMinScore(Number(e.target.value))} className="w-20" />
+          <span className="text-sm font-semibold text-[#10B981] font-mono w-7 text-right">{filterMinScore}</span>
+        </div>
+      </div>
+
+      <div className="dark-card overflow-hidden">
+        <div className="px-5 py-4 border-b border-[rgba(148,163,184,0.06)]">
+          <h2 className="text-base font-bold text-[#F1F5F9]">Leads <span className="font-mono text-[#10B981]">({sortedLeads.length})</span></h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="dark-table">
+            <thead>
+              <tr>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_name')}>Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_name')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>City<span className="text-[#64748B] text-xs ml-1">{sortArrow('city')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('hvac_score')}>Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('hvac_score')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('status')}>Status<span className="text-[#64748B] text-xs ml-1">{sortArrow('status')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('lead_source')}>Source<span className="text-[#64748B] text-xs ml-1">{sortArrow('lead_source')}</span></th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('discovered_at')}>Disc.<span className="text-[#64748B] text-xs ml-1">{sortArrow('discovered_at')}</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedLeads.length === 0 ? (
+                <tr><td colSpan={11} className="text-center py-8 text-[#64748B]">No leads match filters</td></tr>
+              ) : sortedLeads.map(lead => (
+                <tr key={lead.id} className="transition-colors">
+                  <td className="font-semibold text-[#F1F5F9]">{lead.business_name}</td>
+                  <td className="text-sm text-[#94A3B8]">{lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#10B981] transition-colors">{lead.phone}</a> : '-'}</td>
+                  <td className="text-sm text-[#94A3B8]">{lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981] transition-colors">{lead.email}</a> : '-'}</td>
+                  <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
+                  <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
+                  <td className="text-[#94A3B8]">{lead.city || '-'}</td>
+                  <td className="text-[#94A3B8]">{lead.business_type || '-'}</td>
+                  <td><ScoreBadge score={lead.hvac_score} /></td>
+                  <td><StatusBadge status={lead.status} /></td>
+                  <td className="text-sm text-[#94A3B8]">{lead.lead_source || '-'}</td>
+                  <td className="text-sm text-[#64748B]">{lead.discovered_at ? new Date(lead.discovered_at).toLocaleDateString() : '-'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TerritoriesPage() {
   const [territories, setTerritories] = useState<Territory[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -14,6 +214,9 @@ export default function TerritoriesPage() {
   const [form, setForm] = useState({ name: '', city: '', province: '', postal_code: '', radius_km: 10 });
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: string } | null>(null);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const selectedId = searchParams.get('id');
 
   const showToast = (msg: string, type: string) => {
     setToast({ msg, type });
@@ -77,6 +280,15 @@ export default function TerritoriesPage() {
     }
   };
 
+  const handleBack = () => {
+    router.push('/territories');
+  };
+
+  // If a territory is selected by id, show its leads inline
+  if (selectedId) {
+    return <TerritoryLeadsView territoryId={selectedId} onBack={handleBack} />;
+  }
+
   const avgScoreColor = (score: number | undefined) => {
     if (!score) return '#64748B';
     if (score > 70) return '#10B981';
@@ -132,7 +344,7 @@ export default function TerritoriesPage() {
           {territories.map(t => (
             <div key={t.id} className="dark-card p-5 hover:border-[rgba(148,163,184,0.2)] transition-all block group hover-lift relative">
               <Link
-                href={`/territories/${t.id}`}
+                href={`/territories?id=${t.id}`}
                 className="block"
               >
               <div className="flex items-start justify-between mb-3">
@@ -287,5 +499,13 @@ export default function TerritoriesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function TerritoriesPageWrapper() {
+  return (
+    <Suspense fallback={<div className="dark-card p-8 text-center"><div className="skeleton h-8 w-48 mb-2 mx-auto" /><div className="skeleton h-64 w-full mt-4" /></div>}>
+      <TerritoriesPage />
+    </Suspense>
   );
 }

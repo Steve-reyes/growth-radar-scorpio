@@ -115,6 +115,24 @@ export default function Navigation() {
         })}
       </nav>
 
+      {/* Docs Link */}
+      <div className="px-3 mb-2">
+        <Link
+          href="/docs"
+          className={`sidebar-link flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+            pathname === '/docs'
+              ? 'sidebar-link-active text-[#F1F5F9]'
+              : 'text-[#64748B] hover:text-[#94A3B8] hover:bg-[rgba(148,163,184,0.04)]'
+          }`}
+        >
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="10" cy="10" r="8" />
+            <path d="M10 7v4M10 14v.01" />
+          </svg>
+          <span>Docs</span>
+        </Link>
+      </div>
+
       {/* User Profile */}
       <div className="px-4 py-4 border-t border-[rgba(148,163,184,0.06)]">
         {isAuthenticated && user ? (
