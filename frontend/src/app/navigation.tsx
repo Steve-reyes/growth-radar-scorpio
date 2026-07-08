@@ -36,6 +36,7 @@ const navItems = [
       </svg>
     ),
   },
+
   {
     name: 'Kanban',
     href: '/kanban',

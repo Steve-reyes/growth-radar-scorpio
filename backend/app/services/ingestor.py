@@ -400,18 +400,10 @@ async def run_ingestion_for_territory(
     if saved_leads:
         await db.flush()
 
-        # Enrich with phone + website (run in background, don't block)
-        for lead in saved_leads:
-            try:
-                phone, website = await enrich_lead_contact(
-                    lead.business_name, lead.city or ""
-                )
-                if phone:
-                    lead.phone = phone
-                if website:
-                    lead.website = website
-            except Exception:
-                continue
+        # Skip enrichment during bulk ingestion
+        # Contact info already available from open data (Coquitlam has phone/email)
+        # Individual enrichment can be triggered later per lead
+        pass
 
     return {
         "new_leads": saved_count,

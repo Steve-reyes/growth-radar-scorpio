@@ -188,6 +188,32 @@ async def update_territory(
     return territory
 
 
+
+
+@router.post("/{territory_id}/ingest")
+async def ingest_territory(
+    territory_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Run ingestion pipeline for a territory to find new leads."""
+    from app.services.ingestor import run_ingestion_for_territory
+
+    result = await db.execute(select(Territory).where(Territory.id == territory_id))
+    territory = result.scalar_one_or_none()
+    if not territory:
+        raise HTTPException(status_code=404, detail="Territory not found")
+
+    ingestion_result = await run_ingestion_for_territory(db, territory)
+    await db.commit()
+
+    return {
+        "detail": f"Ingestion complete for {territory.name}",
+        "new_leads": ingestion_result["new_leads"],
+        "sources": ingestion_result["sources"],
+    }
+
+
 @router.delete("/{territory_id}")
 async def delete_territory(
     territory_id: int,
