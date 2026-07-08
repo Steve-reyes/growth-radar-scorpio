@@ -34,6 +34,7 @@ class LeadResponse(BaseModel):
     province: Optional[str]
     postal_code: Optional[str]
     phone: Optional[str]
+    email: Optional[str]
     website: Optional[str]
     licence_fee: Optional[int] = None
     num_employees: Optional[int] = None
