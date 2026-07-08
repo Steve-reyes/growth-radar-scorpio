@@ -9,6 +9,7 @@ from app.api.leads import router as leads_router
 from app.api.briefs import router as briefs_router
 from app.api.settings import router as settings_router
 from app.api.auth import router as auth_router
+from app.api.kanban import router as kanban_router
 
 
 @asynccontextmanager
@@ -40,6 +41,7 @@ app.include_router(leads_router)
 app.include_router(briefs_router)
 app.include_router(settings_router)
 app.include_router(auth_router)
+app.include_router(kanban_router)
 
 
 @app.get("/")

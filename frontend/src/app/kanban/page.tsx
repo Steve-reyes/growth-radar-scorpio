@@ -57,9 +57,9 @@ export default function KanbanPage() {
 
   const handleStatusUpdate = async (leadId: number, newStatus: string) => {
     try {
-      const updated = await apiPatch<Lead>(`/api/leads/${leadId}`, { status: newStatus });
-      setLeads(prev => prev.map(l => l.id === leadId ? updated : l));
-      if (selectedLead?.id === leadId) setSelectedLead(updated);
+      await apiPatch(`/api/kanban/leads/${leadId}`, { status: newStatus });
+      setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus } : l));
+      if (selectedLead?.id === leadId) setSelectedLead({ ...selectedLead, status: newStatus });
       showToast(`Status updated to ${newStatus}`, 'success');
     } catch {
       showToast('Failed to update status', 'error');
@@ -67,13 +67,10 @@ export default function KanbanPage() {
   };
 
   useEffect(() => {
-    Promise.all([
-      apiGet<Lead[]>('/api/leads?limit=2000'),
-      apiGet<Territory[]>('/api/territories'),
-    ])
-      .then(([leadsData, territoriesData]) => {
-        setLeads(leadsData);
-        setTerritories(territoriesData.filter(t => t.is_active));
+    apiGet<{ leads: Lead[]; territories: Territory[] }>('/api/kanban/leads')
+      .then((data) => {
+        setLeads(data.leads);
+        setTerritories(data.territories.filter(t => t.is_active));
       })
       .catch(() => showToast('Failed to load data', 'error'))
       .finally(() => setLoading(false));
@@ -102,7 +99,7 @@ export default function KanbanPage() {
     setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: newStatus } : l));
 
     try {
-      await apiPatch(`/api/leads/${leadId}`, { status: newStatus });
+      await apiPatch(`/api/kanban/leads/${leadId}`, { status: newStatus });
       showToast(`Moved to ${newStatus}`, 'success');
     } catch {
       setLeads(prev => prev.map(l => l.id === leadId ? { ...l, status: lead.status } : l));

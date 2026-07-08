@@ -289,7 +289,7 @@ export default function Dashboard() {
                 ) : (
                   sortedLeads.map((lead) => (
                     <tr key={lead.id} className="transition-colors">
-                      <td className="font-semibold text-[#F1F5F9]">{lead.business_name}</td>
+                      <td className="font-semibold text-[#F1F5F9] cursor-pointer hover:text-[#10B981] transition-colors" onClick={() => handleLeadClick(lead.id)}>{lead.business_name}</td>
                       <td className="text-sm text-[#94A3B8]">
                         {lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#10B981]">{lead.phone}</a> : '-'}
                       </td>

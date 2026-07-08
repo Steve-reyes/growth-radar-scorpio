@@ -19,7 +19,7 @@ class Base(DeclarativeBase):
 async def init_db() -> None:
     """Create all tables."""
     async with engine.begin() as conn:
-        from app.models import Territory, Lead, DailyBrief, User  # noqa: F401
+        from app.models import Territory, Lead, DailyBrief, User, UserLeadStatus  # noqa: F401
         await conn.run_sync(Base.metadata.create_all)
 
 
