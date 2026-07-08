@@ -25,6 +25,8 @@ export interface Lead {
   phone: string | null;
   email: string | null;
   website: string | null;
+  licence_fee: number | null;
+  num_employees: number | null;
   business_type: string | null;
   hvac_score: number;
   score_reason: string | null;

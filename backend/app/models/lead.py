@@ -16,6 +16,8 @@ class Lead(Base):
     phone = Column(String(50), nullable=True)
     email = Column(String(255), nullable=True)
     website = Column(String(255), nullable=True)
+    licence_fee = Column(Integer, nullable=True)
+    num_employees = Column(Integer, nullable=True)
     business_type = Column(String(100), nullable=True)
     hvac_score = Column(Integer, default=0, nullable=False)
     score_reason = Column(Text, nullable=True)

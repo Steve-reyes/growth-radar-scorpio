@@ -294,6 +294,16 @@ export default function KanbanPage() {
                   <a href={`mailto:${selectedLead.email}`} className="text-[#10B981] hover:underline">{selectedLead.email}</a>
                 </div>
               )}
+              {(selectedLead.licence_fee || selectedLead.num_employees) && (
+                <div className="col-span-2 flex gap-4 mt-1">
+                  {selectedLead.licence_fee && (
+                    <span className="text-sm"><span className="text-[#64748B]">Fee:</span> <span className="text-[#F1F5F9] font-mono">${selectedLead.licence_fee.toLocaleString()}</span></span>
+                  )}
+                  {selectedLead.num_employees && (
+                    <span className="text-sm"><span className="text-[#64748B]">Emp:</span> <span className="text-[#F1F5F9] font-mono">{selectedLead.num_employees}</span></span>
+                  )}
+                </div>
+              )}
               {selectedLead.website && (
                 <div>
                   <span className="text-[#64748B]">Website:</span>{' '}

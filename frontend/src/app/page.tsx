@@ -98,7 +98,7 @@ export default function Dashboard() {
       try {
         const [statsData, leadsData] = await Promise.all([
           apiGet<DashboardStats>('/api/settings/stats').catch(() => null),
-          apiGet<Lead[]>('/api/leads?limit=50').catch(() => [])
+          apiGet<Lead[]>('/api/leads?limit=200').catch(() => [])
         ]);
         if (statsData) setStats(statsData);
         if (leadsData) setLeads(leadsData);
@@ -254,6 +254,12 @@ export default function Dashboard() {
                   <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
                     Email<span className="ml-1">{sortArrow('email')}</span>
                   </th>
+                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-right cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('licence_fee')}>
+                    Fee<span className="ml-1">{sortArrow('licence_fee')}</span>
+                  </th>
+                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-right cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('num_employees')}>
+                    Emp<span className="ml-1">{sortArrow('num_employees')}</span>
+                  </th>
                   <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>
                     City<span className="ml-1">{sortArrow('city')}</span>
                   </th>
@@ -278,7 +284,7 @@ export default function Dashboard() {
                   </>
                 ) : leads.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-8 text-[#64748B]">No leads yet</td>
+                    <td colSpan={10} className="text-center py-8 text-[#64748B]">No leads yet</td>
                   </tr>
                 ) : (
                   sortedLeads.map((lead) => (
@@ -290,6 +296,8 @@ export default function Dashboard() {
                       <td className="text-sm text-[#94A3B8]">
                         {lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981]">{lead.email}</a> : '-'}
                       </td>
+                      <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
+                      <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
                       <td className="text-[#94A3B8]">{lead.city || '-'}</td>
                       <td className="text-[#94A3B8] max-w-[200px] truncate">{lead.business_type || '-'}</td>
                       <td><ScoreBadge score={lead.hvac_score} /></td>

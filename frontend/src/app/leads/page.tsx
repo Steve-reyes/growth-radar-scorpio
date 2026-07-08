@@ -95,7 +95,7 @@ export default function LeadsPage() {
     if (statusFilter) params.set('status', statusFilter);
     if (minScore > 0) params.set('min_score', String(minScore));
     if (search) params.set('search', search);
-    params.set('limit', '2000');
+    params.set('limit', '200');
 
     setLoading(true);
     apiGet<Lead[]>(`/api/leads?${params.toString()}`)
@@ -332,6 +332,12 @@ export default function LeadsPage() {
                           <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
                             Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span>
                           </th>
+                          <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>
+                            Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span>
+                          </th>
+                          <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>
+                            Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span>
+                          </th>
                           <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>
                             Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span>
                           </th>
@@ -363,6 +369,8 @@ export default function LeadsPage() {
                             <td className="text-sm text-[#94A3B8]">
                               {lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981]">{lead.email}</a> : '-'}
                             </td>
+                            <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
+                            <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
                             <td className="text-[#94A3B8]">{lead.business_type || '-'}</td>
                             <td><ScoreBadge score={lead.hvac_score} /></td>
                             <td className="text-sm text-[#94A3B8]">{lead.lead_source || '-'}</td>
@@ -415,6 +423,16 @@ export default function LeadsPage() {
                 <div>
                   <span className="text-[#64748B]">Email:</span>{' '}
                   <a href={`mailto:${selectedLead.email}`} className="text-[#10B981] hover:underline">{selectedLead.email}</a>
+                </div>
+              )}
+              {(selectedLead.licence_fee || selectedLead.num_employees) && (
+                <div className="col-span-2 flex gap-4">
+                  {selectedLead.licence_fee && (
+                    <span className="text-sm"><span className="text-[#64748B]">Fee:</span> <span className="text-[#F1F5F9] font-mono">${selectedLead.licence_fee.toLocaleString()}</span></span>
+                  )}
+                  {selectedLead.num_employees && (
+                    <span className="text-sm"><span className="text-[#64748B]">Emp:</span> <span className="text-[#F1F5F9] font-mono">{selectedLead.num_employees}</span></span>
+                  )}
                 </div>
               )}
               {selectedLead.website && (

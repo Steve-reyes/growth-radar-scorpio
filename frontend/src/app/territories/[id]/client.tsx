@@ -299,6 +299,12 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
                 <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
                   Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span>
                 </th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>
+                  Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span>
+                </th>
+                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>
+                  Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span>
+                </th>
                 <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>
                   City<span className="text-[#64748B] text-xs ml-1">{sortArrow('city')}</span>
                 </th>
@@ -322,7 +328,7 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
             <tbody>
               {sortedLeads.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-8 text-[#64748B]">No leads match filters</td>
+                  <td colSpan={11} className="text-center py-8 text-[#64748B]">No leads match filters</td>
                 </tr>
               ) : (
                 sortedLeads.map(lead => (
@@ -338,6 +344,8 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
                         <a href={`mailto:${lead.email}`} className="hover:text-[#10B981] transition-colors">{lead.email}</a>
                       ) : '-'}
                     </td>
+                    <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
+                    <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
                     <td className="text-[#94A3B8]">{lead.city || '-'}</td>
                     <td className="text-[#94A3B8]">{lead.business_type || '-'}</td>
                     <td><ScoreBadge score={lead.hvac_score} /></td>

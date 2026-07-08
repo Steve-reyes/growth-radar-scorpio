@@ -35,6 +35,8 @@ class LeadResponse(BaseModel):
     postal_code: Optional[str]
     phone: Optional[str]
     website: Optional[str]
+    licence_fee: Optional[int] = None
+    num_employees: Optional[int] = None
     business_type: Optional[str]
     hvac_score: int
     score_reason: Optional[str]

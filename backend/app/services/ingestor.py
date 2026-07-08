@@ -208,6 +208,8 @@ async def ingest_vancouver_open_data(
                 business_type = record.get("businesstype", "") or ""
                 business_subtype = record.get("businesssubtype", "") or ""
                 full_type = f"{business_type} {business_subtype}".strip()
+                licence_fee = record.get("feepaid")
+                num_employees = record.get("numberofemployees")
 
                 # Check HVAC potential
                 has_potential, hvac_score, score_reason = _has_hvac_potential(
@@ -232,6 +234,8 @@ async def ingest_vancouver_open_data(
                     postal_code=record.get("postalcode"),
                     phone=None,
                     website=None,
+                    licence_fee=licence_fee,
+                    num_employees=num_employees,
                     business_type=full_type or None,
                     hvac_score=hvac_score,
                     score_reason=score_reason,
