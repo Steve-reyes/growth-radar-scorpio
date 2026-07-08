@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "./navigation";
+import { AuthProvider } from "@/lib/auth-context";
+import { AuthGuard } from "@/lib/auth-guard";
+import { AppShell } from "./app-shell";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -23,11 +26,14 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} h-full`}
     >
-      <body className="min-h-full bg-[#F2F2F7] dark:bg-[#1C1C1E] font-sans antialiased">
-        <Navigation />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          {children}
-        </main>
+      <body className="min-h-full bg-[#0F1117] text-[#F1F5F9] font-sans antialiased">
+        <AuthProvider>
+          <AuthGuard>
+            <AppShell>
+              {children}
+            </AppShell>
+          </AuthGuard>
+        </AuthProvider>
       </body>
     </html>
   );

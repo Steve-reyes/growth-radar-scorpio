@@ -1,0 +1,43 @@
+"""Canadian-specific helpers for Growth Radar."""
+
+PROVINCES = {
+    "AB": "Alberta",
+    "BC": "British Columbia",
+    "MB": "Manitoba",
+    "NB": "New Brunswick",
+    "NL": "Newfoundland and Labrador",
+    "NS": "Nova Scotia",
+    "ON": "Ontario",
+    "PE": "Prince Edward Island",
+    "QC": "Quebec",
+    "SK": "Saskatchewan",
+    "NT": "Northwest Territories",
+    "NU": "Nunavut",
+    "YT": "Yukon",
+}
+
+INDUSTRY_KEYWORDS = {
+    "restaurant": "Restaurant",
+    "cafe": "Restaurant",
+    "bakery": "Restaurant",
+    "warehouse": "Warehouse",
+    "logistics": "Warehouse",
+    "manufacturing": "Manufacturing",
+    "factory": "Manufacturing",
+    "hotel": "Hotel",
+    "motel": "Hotel",
+    "inn": "Hotel",
+    "office": "Office",
+    "retail": "Retail",
+    "store": "Retail",
+    "grocery": "Grocery",
+    "supermarket": "Grocery",
+    "school": "School",
+    "daycare": "Daycare",
+    "clinic": "Medical",
+    "medical": "Medical",
+    "gym": "Gym",
+    "fitness": "Gym",
+    "apartment": "Apartment",
+    "condo": "Residential",
+}

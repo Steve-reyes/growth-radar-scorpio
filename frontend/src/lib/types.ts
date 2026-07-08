@@ -8,8 +8,10 @@ export interface Territory {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-  lead_count?: number;
+  total_leads?: number;
+  new_leads?: number;
   avg_score?: number;
+  high_potential?: number;
 }
 
 export interface Lead {
@@ -21,6 +23,7 @@ export interface Lead {
   province: string | null;
   postal_code: string | null;
   phone: string | null;
+  email: string | null;
   website: string | null;
   business_type: string | null;
   hvac_score: number;
@@ -42,6 +45,7 @@ export interface DailyBrief {
   lead_count: number;
   generated_at: string;
   delivered: boolean;
+  top_lead_ids: number[];
 }
 
 export interface DashboardStats {

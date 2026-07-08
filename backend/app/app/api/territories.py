@@ -54,44 +54,16 @@ class TerritoryStats(TerritoryResponse):
     high_potential: int = 0
 
 
-@router.get("", response_model=list[TerritoryStats])
+@router.get("", response_model=list[TerritoryResponse])
 async def list_territories(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all active territories with lead stats."""
-    stmt = select(Territory).where(Territory.is_active == True).order_by(Territory.name.asc())
+    """List all territories, active first."""
+    stmt = select(Territory).order_by(Territory.is_active.desc(), Territory.name.asc())
     result = await db.execute(stmt)
     territories = result.scalars().all()
-
-    output = []
-    for t in territories:
-        count_stmt = select(func.count(Lead.id)).where(Lead.territory_id == t.id)
-        total = (await db.execute(count_stmt)).scalar() or 0
-
-        new_stmt = select(func.count(Lead.id)).where(
-            Lead.territory_id == t.id, Lead.status == "new"
-        )
-        new_count = (await db.execute(new_stmt)).scalar() or 0
-
-        avg_stmt = select(func.coalesce(func.avg(Lead.hvac_score), 0)).where(
-            Lead.territory_id == t.id
-        )
-        avg = float((await db.execute(avg_stmt)).scalar() or 0)
-
-        high_stmt = select(func.count(Lead.id)).where(
-            Lead.territory_id == t.id, Lead.hvac_score >= 70
-        )
-        high = (await db.execute(high_stmt)).scalar() or 0
-
-        output.append(TerritoryStats(
-            id=t.id, name=t.name, city=t.city, province=t.province,
-            postal_code=t.postal_code, radius_km=t.radius_km,
-            is_active=t.is_active, created_at=t.created_at, updated_at=t.updated_at,
-            total_leads=total, new_leads=new_count, avg_score=round(avg, 1),
-            high_potential=high,
-        ))
-    return output
+    return territories
 
 
 @router.post("", response_model=TerritoryResponse, status_code=201)

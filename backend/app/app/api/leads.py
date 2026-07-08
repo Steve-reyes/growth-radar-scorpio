@@ -34,6 +34,7 @@ class LeadResponse(BaseModel):
     province: Optional[str]
     postal_code: Optional[str]
     phone: Optional[str]
+    email: Optional[str] = None
     website: Optional[str]
     business_type: Optional[str]
     hvac_score: int
@@ -57,7 +58,7 @@ async def list_leads(
     status: Optional[str] = Query(None),
     min_score: Optional[int] = Query(None),
     business_type: Optional[str] = Query(None),
-    limit: int = Query(50, ge=1, le=2000),
+    limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):

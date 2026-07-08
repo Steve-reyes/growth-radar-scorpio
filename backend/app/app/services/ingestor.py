@@ -248,88 +248,6 @@ async def ingest_vancouver_open_data(
     return leads
 
 
-COQUITLAM_API = "https://services2.arcgis.com/Q6Lq3evZUGfPrN7o/arcgis/rest/services/Business_Licenses/FeatureServer/0/query"
-
-
-async def ingest_coquitlam_open_data(
-    db: AsyncSession,
-    territory: Territory,
-) -> list[Lead]:
-    """Pull business licences from Coquitlam Open Data ArcGIS API.
-
-    Coquitlam dataset has phone + email fields — no enrichment needed.
-    """
-    import httpx
-
-    leads: list[Lead] = []
-
-    try:
-        async with httpx.AsyncClient(timeout=60.0) as client:
-            where = "U_STATUSCODEDESC = 'Issued'"
-            params = {
-                "where": where,
-                "outFields": "COLBUSINESSNAME,COL_BUSINESSADDR,COL_BUSINESSPHONE,EMAILADDRESS,U_SUBCODEDESC,ISSUEDATE,LAT,LONG",
-                "returnGeometry": "false",
-                "f": "json",
-                "resultRecordCount": 2000,
-                "orderByFields": "ISSUEDATE DESC",
-            }
-
-            response = await client.get(COQUITLAM_API, params=params)
-
-            if response.status_code != 200:
-                return []
-
-            data = response.json()
-            features = data.get("features", [])
-
-            for feat in features:
-                attrs = feat.get("attributes", {})
-                business_name = (attrs.get("COLBUSINESSNAME") or "").strip()
-                if not business_name:
-                    continue
-
-                business_type = (attrs.get("U_SUBCODEDESC") or "").strip()
-                address = (attrs.get("COL_BUSINESSADDR") or "").strip()
-                phone = (attrs.get("COL_BUSINESSPHONE") or "").strip()
-                email = (attrs.get("EMAILADDRESS") or "").strip()
-
-                # Check HVAC potential
-                has_potential, hvac_score, score_reason = _has_hvac_potential(
-                    business_type, business_name
-                )
-
-                if not has_potential:
-                    continue
-
-                notes_parts = []
-                if email:
-                    notes_parts.append(f"Email: {email}")
-                notes = "; ".join(notes_parts) if notes_parts else None
-
-                lead = Lead(
-                    territory_id=territory.id,
-                    business_name=business_name,
-                    address=address or None,
-                    city="Coquitlam",
-                    province="BC",
-                    phone=phone or None,
-                    website=None,
-                    business_type=business_type or None,
-                    hvac_score=hvac_score,
-                    score_reason=score_reason,
-                    lead_source="coquitlam_open_data",
-                    status="new",
-                    notes=notes,
-                )
-                leads.append(lead)
-
-    except (httpx.RequestError, httpx.TimeoutException, ValueError):
-        pass
-
-    return leads
-
-
 async def ingest_municipal_permits(
     db: AsyncSession,
     territory: Territory,
@@ -346,9 +264,6 @@ async def ingest_municipal_permits(
 
     if "vancouver" in city_lower:
         return await ingest_vancouver_open_data(db, territory)
-
-    if "coquitlam" in city_lower:
-        return await ingest_coquitlam_open_data(db, territory)
 
     return []
 
