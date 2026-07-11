@@ -1,7 +1,7 @@
 """Data ingestion service for Growth Radar.
 
 Ingests business data from Canadian public sources (ISED API, municipal open data)
-and creates Lead records scored by HVAC potential.
+and creates Lead records scored by client potential.
 """
 
 from typing import Optional
@@ -38,7 +38,7 @@ async def ingest_ised_new_businesses(
 ) -> list[Lead]:
     """Query ISED API for recently incorporated businesses in the territory.
 
-    Filters by relevant NAICS codes for HVAC opportunities.
+    Scores each business by digital marketing potential.
     Returns list of unsaved Lead objects.
     """
     import httpx
@@ -81,13 +81,13 @@ async def ingest_ised_new_businesses(
                 business_type = _infer_business_type(corp_name)
 
                 # Score the lead
-                hvac_score, score_reason = score_business(
+                dm_score, score_reason = score_business(
                     business_type=business_type,
                     business_name=corp_name,
                 )
 
                 # Skip very low scores
-                if hvac_score < 20:
+                if dm_score < 20:
                     continue
 
                 lead = Lead(
@@ -98,7 +98,7 @@ async def ingest_ised_new_businesses(
                     province=territory.province,
                     postal_code=corp.get("postalCode", ""),
                     business_type=business_type,
-                    hvac_score=hvac_score,
+                    hvac_score=dm_score,
                     score_reason=score_reason,
                     lead_source="ised_api",
                     source_id=str(corp.get("corporationNumber", "")),
@@ -115,8 +115,8 @@ async def ingest_ised_new_businesses(
 
 VANCOUVER_API_BASE = "https://opendata.vancouver.ca/api/explore/v2.1/catalog/datasets/business-licences/records"
 
-# Business types that indicate HVAC-heavy commercial buildings
-HIGH_HVAC_BUSINESS_TYPES = [
+# Business types that are high-value digital marketing targets
+HIGH_VALUE_BUSINESS_TYPES = [
     "Restaurant", "Food Service", "Bar", "Pub", "Brewery", "Caterer",
     "Hotel", "Motel",
     "Grocery", "Supermarket",
@@ -126,63 +126,111 @@ HIGH_HVAC_BUSINESS_TYPES = [
     "School", "College", "University",
     "Hospital", "Medical Clinic", "Dental Clinic",
     "Daycare",
+    "Electrician", "Electrical Contractor",
+    "Plumber", "Plumbing Contractor",
+    "Roofer", "Roofing Contractor",
+    "Painting Contractor", "Landscaping",
+    "Auto Repair", "Auto Body",
+    "Salon", "Barber",
+    "Chiropractor", "Optometrist",
+    "Law Firm", "Real Estate Agency",
 ]
 
-HOT_HVAC_KEYWORDS = {
-    # Core service providers (Boss's clients)
-    "hvac": 95, "heating": 95, "cooling": 90, "ventilation": 90, "furnace": 95,
-    "air condition": 95, "ac repair": 95, "refrigeration": 85,
-    "roofing": 95, "roof repair": 90, "roofer": 90, "roofing contractor": 90,
-    "electrical": 85, "electrician": 90, "electrical contractor": 85,
-    "plumbing": 85, "plumber": 90, "plumbing contractor": 85, "drain": 75,
-    "mechanical": 80, "mechanical contractor": 80,
-    "contractor": 65, "general contractor": 65, "renovation": 60,
-    "construction": 60, "building contractor": 65,
-    # Commercial properties needing service contracts
+DIGITAL_MARKETING_KW = {
+    # ===== GOLD (90-100) =====
+    # High-ticket service providers with fierce online competition
+    # These businesses COMPETE for customers and will pay for SEO/leadgen
+    "hvac": 100, "heating": 100, "cooling": 95, "furnace": 100,
+    "air condition": 100, "ac repair": 100, "refrigeration": 90,
+    "roofing": 100, "roofer": 100, "roof repair": 95,
+    "electrical contractor": 95, "electrician": 95, "electrical": 90,
+    "plumbing contractor": 95, "plumber": 95, "plumbing": 90,
+    "mechanical contractor": 90, "mechanical": 85,
+    "dental": 95, "dentist": 95, "dentistry": 95,
+    "chiropractic": 90, "chiropractor": 90,
+    "medical clinic": 90, "walk-in": 85, "urgent care": 90,
+    "optometry": 85, "optician": 80, "eye care": 85,
+    "law firm": 95, "lawyer": 95, "attorney": 95, "legal": 90,
+    "real estate": 90, "realtor": 95, "realty": 90, "property management": 80,
+    "insurance": 85, "insurance broker": 85,
+    "financial advisor": 85, "mortgage": 85, "accounting": 75,
+
+    # ===== EXCELLENT (75-89) =====
+    # Competitive local businesses, strong digital marketing ROI
     "restaurant": 90, "cafe": 85, "bakery": 80, "kitchen": 90,
-    "brewery": 85, "distillery": 80, "catering": 75,
-    "hotel": 85, "motel": 80, "inn": 75, "hospitality": 75,
-    "warehouse": 75, "logistics": 70, "storage": 60,
-    "manufacturing": 80, "factory": 80, "industrial": 75,
-    "gym": 70, "fitness": 70, "wellness": 55,
-    "grocery": 70, "supermarket": 70, "market": 50,
-    "school": 60, "college": 65, "daycare": 55,
-    "clinic": 60, "medical": 65, "dental": 55, "pharmacy": 60,
-    "office": 50, "retail": 45, "store": 40,
-    "food": 80, "meal": 75, "lunch": 70,
-    "laundry": 50, "cleaning": 45,
-    "auto": 55, "repair": 50, "garage": 50, "auto repair": 55,
+    "brewery": 85, "distillery": 80, "catering": 80, "bar": 80,
+    "hotel": 90, "motel": 85, "inn": 80, "hospitality": 80, "resort": 85,
+    "auto repair": 85, "auto shop": 80, "mechanic": 80, "garage": 75,
+    "car dealer": 85, "auto dealer": 85, "dealership": 85,
+    "gym": 80, "fitness": 80, "fitness center": 80, "yoga": 70, "wellness": 70,
+    "general contractor": 80, "contractor": 80, "renovation": 75, "remodel": 75,
+    "construction": 75, "building contractor": 80,
+    "warehouse": 65, "logistics": 70, "storage": 55,
+    "manufacturing": 75, "factory": 75, "industrial": 70,
+    "daycare": 75, "childcare": 75, "preschool": 75,
+    "pharmacy": 75, "drug store": 70,
+    "veterinary": 85, "vet": 85, "animal hospital": 85,
+    "martial arts": 75, "dance studio": 70,
+    "salon": 75, "barber": 70, "spa": 75, "nail salon": 70,
+    "cleaning service": 75, "janitorial": 70,
+    "landscaping": 75, "lawn care": 75, "tree service": 75,
+    "snow removal": 70, "pest control": 80,
+    "drywall": 70, "painting contractor": 75, "painting": 70,
+    "flooring": 70, "carpentry": 65, "paving": 70, "concrete": 70,
+    "masonry": 65, "fencing": 65, "roofing company": 100,
+
+    # ===== GOOD (50-69) =====
+    # Stable businesses, some digital marketing need
+    "grocery": 70, "supermarket": 70, "market": 55,
+    "food": 75, "meal prep": 70, "catering company": 75,
+    "school": 60, "college": 65, "academy": 65, "learning center": 65,
+    "clinic": 70, "medical": 70, "health": 65,
+    "office": 45, "retail": 50, "store": 45, "boutique": 50,
+    "laundry": 50, "dry cleaning": 50,
+    "auto body": 65, "auto glass": 65, "tire shop": 65,
     "theatre": 60, "cinema": 60, "entertainment": 55,
-    "church": 50, "temple": 50, "worship": 50,
-    "lawn": 50, "garden": 45, "landscaping": 50,
-    "childcare": 55, "preschool": 55,
-    "dentist": 55, "optician": 50, "chiropractor": 50,
-    # Related trades
-    "drywall": 60, "painting": 50, "flooring": 50, "carpentry": 55,
-    "paving": 55, "concrete": 55, "masonry": 55, "fencing": 45,
-    "snow removal": 60, "landscaping": 50, "property maintenance": 55,
+    "church": 45, "temple": 45, "worship": 45,
+    "garden center": 55, "nursery": 55,
+    "childcare center": 65,
+    "convenience store": 45, "gas station": 50,
+    "pet grooming": 60, "pet store": 55,
+    "travel agency": 65, "tourism": 60,
+
+    # ===== LOW (30-49) =====
+    # Low digital marketing ROI or limited budget
+    "property maintenance": 55, "handyman": 55,
+    "freight": 50, "shipping": 45, "transport": 45,
+    "wholesale": 45, "supply": 40, "supplier": 40,
+    "distribution": 45, "distributor": 45,
+    "consulting": 45, "consultant": 45,
+    "accounting firm": 55,
+    "printing": 50, "sign shop": 45,
+    "photography": 55, "photographer": 55,
+    "locksmith": 55,
+    "plumbing supply": 45, "electrical supply": 45,
 }
 
 
-def _has_hvac_potential(business_type: str, business_name: str) -> tuple[bool, int, str]:
-    """Check if a business has HVAC potential based on type and name.
+def _has_lead_potential(business_type: str, business_name: str) -> tuple[bool, int, str]:
+    """Score a business by how likely they are to buy digital marketing services.
 
+    High score = this business needs SEO, web dev, lead gen, or AI automation.
     Returns (has_potential, score, reason).
     """
     lower_type = (business_type or "").lower()
     lower_name = (business_name or "").lower()
 
     # Check business type for direct matches
-    for kw, score in HOT_HVAC_KEYWORDS.items():
+    for kw, score in DIGITAL_MARKETING_KW.items():
         if kw in lower_type:
             return True, score, f"Business type '{business_type}' matches '{kw}'"
 
     # Check business name for keyword matches
-    for kw, score in HOT_HVAC_KEYWORDS.items():
+    for kw, score in DIGITAL_MARKETING_KW.items():
         if kw in lower_name:
             return True, score, f"Business name matches '{kw}'"
 
-    return False, 30, "General commercial — low HVAC priority"
+    return False, 30, "General commercial -- low digital marketing priority"
 
 
 async def ingest_vancouver_open_data(
@@ -229,8 +277,8 @@ async def ingest_vancouver_open_data(
                 licence_fee = record.get("feepaid")
                 num_employees = record.get("numberofemployees")
 
-                # Check HVAC potential
-                has_potential, hvac_score, score_reason = _has_hvac_potential(
+                # Check client potential
+                has_potential, dm_score, score_reason = _has_lead_potential(
                     full_type, business_name
                 )
 
@@ -251,7 +299,7 @@ async def ingest_vancouver_open_data(
                     licence_fee=licence_fee,
                     num_employees=num_employees,
                     business_type=full_type or None,
-                    hvac_score=hvac_score,
+                    hvac_score=dm_score,
                     score_reason=score_reason,
                     lead_source="vancouver_open_data",
                     source_id=record.get("licencenumber"),
@@ -312,8 +360,8 @@ async def ingest_coquitlam_open_data(
                 phone = (attrs.get("COL_BUSINESSPHONE") or "").strip()
                 email = (attrs.get("EMAILADDRESS") or "").strip()
 
-                # Check HVAC potential
-                has_potential, hvac_score, score_reason = _has_hvac_potential(
+                # Check client potential
+                has_potential, dm_score, score_reason = _has_lead_potential(
                     business_type, business_name
                 )
 
@@ -334,7 +382,7 @@ async def ingest_coquitlam_open_data(
                     phone=phone or None,
                     website=None,
                     business_type=business_type or None,
-                    hvac_score=hvac_score,
+                    hvac_score=dm_score,
                     score_reason=score_reason,
                     lead_source="coquitlam_open_data",
                     status="new",
@@ -377,7 +425,7 @@ async def ingest_toronto_open_data(
                 addr = " ".join(filter(None, [r.get(k) for k in ["Licence Address Line 1", "Licence Address Line 2", "Licence Address Line 3"]]))
                 phone = r.get("Business Phone") or None
                 status = "Cancelled" if r.get("Cancel Date") else "Active"
-                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                has_potential, dm_score, score_reason = _has_lead_potential(btype, name)
                 if not has_potential:
                     continue
                 lead = Lead(
@@ -386,7 +434,7 @@ async def ingest_toronto_open_data(
                     address=addr or None,
                     city="Toronto", province="ON",
                     phone=phone, business_type=btype or None,
-                    hvac_score=hvac_score, score_reason=score_reason,
+                    hvac_score=dm_score, score_reason=score_reason,
                     lead_source="toronto_open_data",
                     source_id=str(r.get("Licence No.", r.get("_id", ""))),
                     status="new",
@@ -420,7 +468,7 @@ async def ingest_calgary_open_data(
                 if not name:
                     continue
                 btype = r.get("licencetypes") or ""
-                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                has_potential, dm_score, score_reason = _has_lead_potential(btype, name)
                 if not has_potential:
                     continue
                 lead = Lead(
@@ -429,7 +477,7 @@ async def ingest_calgary_open_data(
                     address=r.get("address") or None,
                     city="Calgary", province="AB",
                     business_type=btype or None,
-                    hvac_score=hvac_score, score_reason=score_reason,
+                    hvac_score=dm_score, score_reason=score_reason,
                     lead_source="calgary_open_data",
                     source_id=str(r.get("getbusid", "")),
                     status="new",
@@ -465,7 +513,7 @@ async def ingest_edmonton_open_data(
                 btype = r.get("business_licence_category") or r.get("licencetype") or ""
                 is_expired = bool(r.get("expiry_date")) and r["expiry_date"] < "2026-01-01"
                 status = "Expired" if is_expired else "Active"
-                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                has_potential, dm_score, score_reason = _has_lead_potential(btype, name)
                 if not has_potential:
                     continue
                 lead = Lead(
@@ -474,7 +522,7 @@ async def ingest_edmonton_open_data(
                     address=r.get("business_address") or None,
                     city="Edmonton", province="AB",
                     business_type=btype or None,
-                    hvac_score=hvac_score, score_reason=score_reason,
+                    hvac_score=dm_score, score_reason=score_reason,
                     lead_source="edmonton_open_data",
                     source_id=str(r.get("externalid", "")),
                     status="new",
@@ -517,7 +565,7 @@ async def ingest_surrey_open_data(
                     continue
                 btype = (r.get("BusinessCategory") or "").strip()
                 phone = (r.get("PhoneNumber") or "").strip()
-                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                has_potential, dm_score, score_reason = _has_lead_potential(btype, name)
                 if not has_potential:
                     continue
                 lead = Lead(
@@ -528,7 +576,7 @@ async def ingest_surrey_open_data(
                     phone=phone or None,
                     postal_code=r.get("PostalCode") or None,
                     business_type=btype or None,
-                    hvac_score=hvac_score, score_reason=score_reason,
+                    hvac_score=dm_score, score_reason=score_reason,
                     lead_source="surrey_open_data",
                     status="new",
                 )
@@ -572,7 +620,7 @@ async def ingest_ised_corporate_fallback(
                         continue
                     city = r.get("city", "") or ""
                     addr = " ".join(filter(None, [r.get("addressLine1", ""), r.get("addressLine2", ""), city]))
-                    has_potential, hvac_score, score_reason = _has_hvac_potential("Corporation", name)
+                    has_potential, dm_score, score_reason = _has_lead_potential("Corporation", name)
                     if not has_potential:
                         continue
                     lead = Lead(
@@ -582,7 +630,7 @@ async def ingest_ised_corporate_fallback(
                         city=city.strip() or territory.city,
                         province=province,
                         business_type=f"HVAC/Mechanical Corporation",
-                        hvac_score=hvac_score, score_reason=score_reason,
+                        hvac_score=dm_score, score_reason=score_reason,
                         lead_source="ised_federal_fallback",
                         source_id=str(r.get("corporationNumber", "")),
                         status="new",
@@ -627,7 +675,7 @@ async def ingest_montreal_open_data(
                 display_name = f"{batiment} — {btype}" if batiment else btype
                 if not display_name:
                     continue
-                has_potential, hvac_score, score_reason = _has_hvac_potential(btype + " " + nature, display_name)
+                has_potential, dm_score, score_reason = _has_lead_potential(btype + " " + nature, display_name)
                 if not has_potential:
                     continue
                 lead = Lead(
@@ -636,7 +684,7 @@ async def ingest_montreal_open_data(
                     address=r.get("emplacement") or None,
                     city=arr or "Montreal", province="QC",
                     business_type=f"Building Permit: {btype}",
-                    hvac_score=hvac_score, score_reason=score_reason,
+                    hvac_score=dm_score, score_reason=score_reason,
                     lead_source="montreal_permits",
                     source_id=str(r.get("id_permis", "")),
                     status="new",
