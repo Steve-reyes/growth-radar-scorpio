@@ -10,6 +10,8 @@ from app.api.briefs import router as briefs_router
 from app.api.settings import router as settings_router
 from app.api.auth import router as auth_router
 from app.api.kanban import router as kanban_router
+from app.api.imports import router as imports_router
+from app.api.imported_kanban import router as imported_kanban_router
 
 
 @asynccontextmanager
@@ -20,7 +22,20 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title=settings.APP_NAME,
+    title="Growth Radar — API",
+    description="""**Commercial HVAC lead intelligence platform.**
+
+Scans Canadian business registries & municipal open data, scores prospects (0–100), imports enriched leads from LeadScraper, and generates AI-powered daily briefs.
+
+### Core Features
+- **Leads — Permits** — Municipal permit leads with HVAC scoring
+- **Leads — Imported** — Batch-imported enriched leads from LeadScraper or CSV
+- **Kanban — Permits** — Drag & drop pipeline (new → contacted → qualified → converted → dismissed)
+- **Kanban — Imported** — Same kanban for imported leads
+- **Daily Briefs** — AI-generated scan summaries (auto or manual trigger)
+- **Territories** — Geographic scan areas (city, province, radius)
+- **Auth** — JWT-based login (admin@growthradar.dev / admin123)
+    """,
     version=settings.APP_VERSION,
     lifespan=lifespan,
 )
@@ -42,13 +57,25 @@ app.include_router(briefs_router)
 app.include_router(settings_router)
 app.include_router(auth_router)
 app.include_router(kanban_router)
+app.include_router(imports_router)
+app.include_router(imported_kanban_router)
 
 
-@app.get("/")
+@app.get("/", summary="API root with app info")
 async def root():
+    """Return basic application metadata.
+
+    Returns the app name and current version. Useful for
+    verifying the API is reachable before making other calls.
+    """
     return {"app": settings.APP_NAME, "version": settings.APP_VERSION}
 
 
-@app.get("/api/health")
+@app.get("/api/health", summary="Health check endpoint")
 async def health_check():
+    """Perform a health check on the API.
+
+    Confirms the service is running and returns the app
+    name, version, and a healthy status indicator.
+    """
     return {"status": "healthy", "app": settings.APP_NAME, "version": settings.APP_VERSION}

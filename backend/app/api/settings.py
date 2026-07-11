@@ -15,11 +15,16 @@ from app.api.auth import get_current_user
 router = APIRouter(prefix="/api/settings", tags=["settings"])
 
 
-@router.get("")
+@router.get("", summary="Get app settings (keys masked)")
 async def get_settings(
     current_user: User = Depends(get_current_user),
 ):
-    """Get all current settings."""
+    """Get all current application settings.
+
+    Returns the app name, version, CORS origins, ISED API base URL,
+    and a boolean indicating whether an OpenAI API key is configured.
+    Sensitive values such as the database URL are masked for security.
+    """
     return {
         "app_name": settings.APP_NAME,
         "app_version": settings.APP_VERSION,
@@ -30,12 +35,17 @@ async def get_settings(
     }
 
 
-@router.post("")
+@router.post("", summary="Update runtime settings")
 async def update_settings(
     data: dict,
     current_user: User = Depends(get_current_user),
 ):
-    """Update settings (runtime in-memory only for MVP)."""
+    """Update runtime application settings.
+
+    For the MVP, settings are updated in-memory for the current
+    session only. Acknowledges the request and returns which keys
+    were received. Full persistence would require a database table.
+    """
     # For MVP, we just acknowledge the request.
     # Full persistence of settings would use a DB table.
     return {
@@ -44,12 +54,17 @@ async def update_settings(
     }
 
 
-@router.get("/stats")
+@router.get("/stats", summary="Get dashboard aggregate stats")
 async def get_stats(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get dashboard stats."""
+    """Get aggregate dashboard statistics.
+
+    Returns total territories, total leads, leads discovered today,
+    new leads, high-potential leads (score ≥ 70), and the average
+    HVAC score across all leads. Used to populate dashboard widgets.
+    """
     # Total territories
     terr_result = await db.execute(select(func.count(Territory.id)))
     total_territories = terr_result.scalar() or 0

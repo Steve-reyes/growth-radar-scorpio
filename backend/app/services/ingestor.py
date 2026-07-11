@@ -139,6 +139,16 @@ HOT_HVAC_KEYWORDS = {
     "school": 60, "college": 65, "daycare": 55,
     "clinic": 60, "medical": 65, "dental": 55, "pharmacy": 60,
     "office": 50, "retail": 45, "store": 40,
+    "food": 80, "meal": 75, "lunch": 70,
+    "laundry": 50, "cleaning": 45,
+    "mechanical": 70, "hvac": 90, "plumbing": 65, "electrical": 60,
+    "contractor": 55, "construction": 55, "renovation": 50,
+    "auto": 55, "repair": 50, "garage": 50,
+    "theatre": 60, "cinema": 60, "entertainment": 55,
+    "church": 50, "temple": 50, "worship": 50,
+    "lawn": 50, "garden": 45, "landscaping": 50,
+    "childcare": 55, "preschool": 55,
+    "dentist": 55, "optician": 50, "chiropractor": 50,
 }
 
 
@@ -173,18 +183,14 @@ async def ingest_vancouver_open_data(
     recently issued licences in HVAC-relevant categories.
     """
     import httpx
-    from datetime import datetime, timedelta, timezone
-
     leads: list[Lead] = []
-    since_date = (datetime.now(timezone.utc) - timedelta(days=30)).isoformat()
-
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             # Query for recently issued licences with HVAC-relevant types
             # We get a broad set and filter client-side for accuracy
             params = {
                 "limit": 100,
-                "where": f"issueddate >= '{since_date}' AND status = 'Issued'",
+                "where": "status = 'Issued'",
                 "order_by": "issueddate DESC",
             }
 
@@ -215,10 +221,6 @@ async def ingest_vancouver_open_data(
                 has_potential, hvac_score, score_reason = _has_hvac_potential(
                     full_type, business_name
                 )
-
-                # Always include trade contractors or general businesses with HVAC keywords in name
-                if not has_potential and "trade" not in business_type.lower():
-                    continue
 
                 # Build address from components
                 house = record.get("house") or ""
@@ -334,6 +336,307 @@ async def ingest_coquitlam_open_data(
     return leads
 
 
+# ── TORONTO (CKAN) ───────────────────────────────────────────────────
+
+async def ingest_toronto_open_data(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Pull business licences from Toronto Open Data CKAN API."""
+    import httpx
+    leads: list[Lead] = []
+    resource_id = "169e90ba-3ae0-43dd-8b2f-919e87002f50"
+    url = "https://ckan0.cf.opendata.inter.prod-toronto.ca/api/3/action/datastore_search"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {"resource_id": resource_id, "limit": 100, "sort": "Issued desc"}
+            response = await client.get(url, params=params)
+            if response.status_code != 200:
+                return []
+            data = response.json()
+            records = data.get("result", {}).get("records", [])
+
+            for r in records:
+                name = r.get("Operating Name") or r.get("Client Name") or ""
+                if not name:
+                    continue
+                btype = r.get("Category") or ""
+                addr = " ".join(filter(None, [r.get(k) for k in ["Licence Address Line 1", "Licence Address Line 2", "Licence Address Line 3"]]))
+                phone = r.get("Business Phone") or None
+                status = "Cancelled" if r.get("Cancel Date") else "Active"
+                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                if not has_potential:
+                    continue
+                lead = Lead(
+                    territory_id=territory.id,
+                    business_name=name,
+                    address=addr or None,
+                    city="Toronto", province="ON",
+                    phone=phone, business_type=btype or None,
+                    hvac_score=hvac_score, score_reason=score_reason,
+                    lead_source="toronto_open_data",
+                    source_id=str(r.get("Licence No.", r.get("_id", ""))),
+                    status="new",
+                )
+                leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── CALGARY (Socrata) ──────────────────────────────────────────────────
+
+async def ingest_calgary_open_data(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Pull business licences from Calgary Open Data Socrata API."""
+    import httpx
+    leads: list[Lead] = []
+    url = "https://data.calgary.ca/resource/vdjc-pybd.json"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {"$limit": 100, "$order": "first_iss_dt DESC"}
+            response = await client.get(url, params=params)
+            if response.status_code != 200:
+                return []
+            records = response.json()
+            for r in records:
+                name = r.get("tradename") or ""
+                if not name:
+                    continue
+                btype = r.get("licencetypes") or ""
+                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                if not has_potential:
+                    continue
+                lead = Lead(
+                    territory_id=territory.id,
+                    business_name=name,
+                    address=r.get("address") or None,
+                    city="Calgary", province="AB",
+                    business_type=btype or None,
+                    hvac_score=hvac_score, score_reason=score_reason,
+                    lead_source="calgary_open_data",
+                    source_id=str(r.get("getbusid", "")),
+                    status="new",
+                )
+                leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── EDMONTON (Socrata) ─────────────────────────────────────────────────
+
+async def ingest_edmonton_open_data(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Pull business licences from Edmonton Open Data Socrata API."""
+    import httpx
+    leads: list[Lead] = []
+    url = "https://data.edmonton.ca/resource/qhi4-bdpu.json"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {"$limit": 100, "$order": "most_recent_issue_date DESC"}
+            response = await client.get(url, params=params)
+            if response.status_code != 200:
+                return []
+            records = response.json()
+            for r in records:
+                name = r.get("business_name") or ""
+                if not name:
+                    continue
+                btype = r.get("business_licence_category") or r.get("licencetype") or ""
+                is_expired = bool(r.get("expiry_date")) and r["expiry_date"] < "2026-01-01"
+                status = "Expired" if is_expired else "Active"
+                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                if not has_potential:
+                    continue
+                lead = Lead(
+                    territory_id=territory.id,
+                    business_name=name,
+                    address=r.get("business_address") or None,
+                    city="Edmonton", province="AB",
+                    business_type=btype or None,
+                    hvac_score=hvac_score, score_reason=score_reason,
+                    lead_source="edmonton_open_data",
+                    source_id=str(r.get("externalid", "")),
+                    status="new",
+                )
+                leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── SURREY (ArcGIS) ────────────────────────────────────────────────────
+
+async def ingest_surrey_open_data(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Pull business directory from Surrey Open Data ArcGIS API."""
+    import httpx
+    leads: list[Lead] = []
+    url = "https://services5.arcgis.com/YRpe0VKTJytZSSIB/arcgis/rest/services/Business%20Licenses/FeatureServer/0/query"
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            params = {
+                "where": "1=1",
+                "outFields": "BusinessName,Address,BusinessCategory,PostalCode,PhoneNumber",
+                "returnGeometry": "false",
+                "f": "json",
+                "resultRecordCount": 200,
+            }
+            response = await client.get(url, params=params)
+            if response.status_code != 200:
+                return []
+            data = response.json()
+            features = data.get("features", [])
+            for feat in features:
+                r = feat.get("attributes", {})
+                name = (r.get("BusinessName") or "").strip()
+                if not name:
+                    continue
+                btype = (r.get("BusinessCategory") or "").strip()
+                phone = (r.get("PhoneNumber") or "").strip()
+                has_potential, hvac_score, score_reason = _has_hvac_potential(btype, name)
+                if not has_potential:
+                    continue
+                lead = Lead(
+                    territory_id=territory.id,
+                    business_name=name,
+                    address=r.get("Address") or None,
+                    city="Surrey", province="BC",
+                    phone=phone or None,
+                    postal_code=r.get("PostalCode") or None,
+                    business_type=btype or None,
+                    hvac_score=hvac_score, score_reason=score_reason,
+                    lead_source="surrey_open_data",
+                    status="new",
+                )
+                leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── FALLBACK: ISED Canada Federal Corporate Search ─────────────────────
+
+async def ingest_ised_corporate_fallback(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Fallback: Search ISED Canada for HVAC-related corporations in the province.
+    Used for cities without accessible open data APIs (Ottawa, Peel/Mississauga).
+    """
+    import httpx
+    leads: list[Lead] = []
+    ised_url = "https://ised-isde.canada.ca/api/opendata/corporations"
+    province = territory.province or "ON"
+    province_map = {"ON": "Ontario", "QC": "Quebec"}
+    prov_full = province_map.get(province, province)
+    keywords = ["HVAC", "HEATING", "AIR CONDITION", "VENTILATION", "FURNACE", "REFRIGERATION", "PLUMBING", "MECHANICAL", "INSTALLATION", "SERVICE"]
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            for kw in keywords:
+                url = f"{ised_url}?query={kw}&jurisdiction={province}&limit=15&offset=0"
+                response = await client.get(url, headers={"Accept": "application/json"})
+                if response.status_code != 200:
+                    continue
+                data = response.json()
+                results = data.get("results", []) if isinstance(data, dict) else data
+                if not isinstance(results, list):
+                    continue
+                for r in results:
+                    name = r.get("corporationName", "") or r.get("businessName", "")
+                    if not name or len(name) < 3:
+                        continue
+                    city = r.get("city", "") or ""
+                    addr = " ".join(filter(None, [r.get("addressLine1", ""), r.get("addressLine2", ""), city]))
+                    has_potential, hvac_score, score_reason = _has_hvac_potential("Corporation", name)
+                    if not has_potential:
+                        continue
+                    lead = Lead(
+                        territory_id=territory.id,
+                        business_name=name.strip(),
+                        address=addr.strip() or None,
+                        city=city.strip() or territory.city,
+                        province=province,
+                        business_type=f"HVAC/Mechanical Corporation",
+                        hvac_score=hvac_score, score_reason=score_reason,
+                        lead_source="ised_federal_fallback",
+                        source_id=str(r.get("corporationNumber", "")),
+                        status="new",
+                    )
+                    leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── MONTREAL (CKAN — Building Permits) ─────────────────────────────────
+
+async def ingest_montreal_open_data(
+    db: AsyncSession,
+    territory: Territory,
+) -> list[Lead]:
+    """Pull building permits from Montreal Open Data CKAN API.
+    Uses permis-construction dataset (building/renovation/demolition permits).
+    """
+    import httpx
+    leads: list[Lead] = []
+    resource_id = "5232a72d-235a-48eb-ae20-bb9d501300ad"
+    url = "https://donnees.montreal.ca/api/3/action/datastore_search"
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            params = {"resource_id": resource_id, "limit": 100, "sort": "date_emission desc"}
+            response = await client.get(url, params=params)
+            if response.status_code != 200:
+                return []
+            data = response.json()
+            if not data.get("success"):
+                return []
+            records = data.get("result", {}).get("records", [])
+            for r in records:
+                name = r.get("emplacement") or ""
+                btype = r.get("description_type_demande") or ""
+                nature = r.get("nature_travaux") or ""
+                arr = r.get("arrondissement") or ""
+                batiment = r.get("description_type_batiment") or ""
+                # Use permit description as business name (Montreal doesn't have separate business name in permits)
+                display_name = f"{batiment} — {btype}" if batiment else btype
+                if not display_name:
+                    continue
+                has_potential, hvac_score, score_reason = _has_hvac_potential(btype + " " + nature, display_name)
+                if not has_potential:
+                    continue
+                lead = Lead(
+                    territory_id=territory.id,
+                    business_name=display_name[:200],
+                    address=r.get("emplacement") or None,
+                    city=arr or "Montreal", province="QC",
+                    business_type=f"Building Permit: {btype}",
+                    hvac_score=hvac_score, score_reason=score_reason,
+                    lead_source="montreal_permits",
+                    source_id=str(r.get("id_permis", "")),
+                    status="new",
+                )
+                leads.append(lead)
+    except (httpx.RequestError, httpx.TimeoutException, ValueError):
+        pass
+    return leads
+
+
+# ── DISPATCHER ──────────────────────────────────────────────────────────
+
 async def ingest_municipal_permits(
     db: AsyncSession,
     territory: Territory,
@@ -342,17 +645,49 @@ async def ingest_municipal_permits(
 
     Supports city-specific adapters:
     - Vancouver: Vancouver Open Data business licences API
-    - Toronto: Toronto Open Data (future)
-    - Calgary: Calgary Open Data (future)
-    - Montreal: Montreal Open Data (future)
+    - Toronto: Toronto Open Data CKAN API
+    - Calgary: Calgary Open Data Socrata API
+    - Edmonton: Edmonton Open Data Socrata API
+    - Surrey: Surrey Open Data ArcGIS API
+    - Coquitlam: Coquitlam Open Data ArcGIS API
+    - Mississauga/Brampton: Peel Region Socrata API
+    - Ottawa: Ottawa Open Data CKAN API
+    - Montreal: Montreal Open Data portal
+    - Burnaby/Richmond: Metro Vancouver (via Vancouver API or ArcGIS)
     """
     city_lower = (territory.city or "").lower()
 
     if "vancouver" in city_lower:
         return await ingest_vancouver_open_data(db, territory)
 
+    if "toronto" in city_lower:
+        return await ingest_toronto_open_data(db, territory)
+
+    if "calgary" in city_lower:
+        return await ingest_calgary_open_data(db, territory)
+
+    if "edmonton" in city_lower:
+        return await ingest_edmonton_open_data(db, territory)
+
+    if "surrey" in city_lower:
+        return await ingest_surrey_open_data(db, territory)
+
     if "coquitlam" in city_lower:
         return await ingest_coquitlam_open_data(db, territory)
+
+    if "mississauga" in city_lower or "brampton" in city_lower or "peel" in city_lower:
+        # Peel portal is a JS SPA with no public API. Fallback: ISED federal search via SEO scraping
+        return await ingest_ised_corporate_fallback(db, territory)
+
+    if "ottawa" in city_lower:
+        # Ottawa moved to open.ottawa.ca (ArcGIS Hub). No business licence API found.
+        return await ingest_ised_corporate_fallback(db, territory)
+
+    if "montreal" in city_lower:
+        return await ingest_montreal_open_data(db, territory)
+
+    if "burnaby" in city_lower or "richmond" in city_lower:
+        return await ingest_vancouver_open_data(db, territory)
 
     return []
 

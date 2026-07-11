@@ -14,7 +14,7 @@ function cleanSummary(text: string): string {
 }
 
 function parseStatLine(line: string): { total?: string; avg?: string; hot?: string } | null {
-  const m = line.match(/Leads:\s*(\d+)\s*.*?Avg Score:\s*(\d+)\/100\s*.*?Hot Leads:\s*(\d+)/);
+  const m = line.match(/(?:Total )?Leads:\s*(\d+)\s*.*?(?:Avg Score(?: Across All)?):\s*(\d+)\/100\s*.*?Hot Leads[^:]*:\s*(\d+)/);
   if (m) return { total: m[1], avg: m[2], hot: m[3] };
   return null;
 }
@@ -298,6 +298,19 @@ export default function BriefsPage() {
                       {sections.filter(s => s.type === 'other').map((s, i) => (
                         <p key={i} className="text-sm text-[#94A3B8] mt-3">{s.text}</p>
                       ))}
+
+                      {/* Recommendations */}
+                      {brief.recommendations && (
+                        <div className="mt-5 p-4 rounded-lg border border-[rgba(245,158,11,0.2)] bg-[rgba(245,158,11,0.04)]">
+                          <div className="flex items-center gap-2 mb-3">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#F59E0B]">
+                              <path d="M6 1L7.5 4L10.5 4.5L8.5 7L9 10L6 8.5L3 10L3.5 7L1.5 4.5L4.5 4L6 1Z" />
+                            </svg>
+                            <h5 className="text-sm font-bold text-[#F59E0B] uppercase tracking-wider">AI Recommendations</h5>
+                          </div>
+                          <div className="text-sm text-[#94A3B8] leading-relaxed whitespace-pre-wrap">{brief.recommendations}</div>
+                        </div>
+                      )}
 
                       {/* Footer */}
                       <div className="mt-5 flex items-center gap-3 text-xs text-[#64748B] pt-3 border-t border-[rgba(148,163,184,0.04)]">

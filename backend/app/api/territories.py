@@ -54,12 +54,17 @@ class TerritoryStats(TerritoryResponse):
     high_potential: int = 0
 
 
-@router.get("", response_model=list[TerritoryStats])
+@router.get("", response_model=list[TerritoryStats], summary="List territories with lead stats")
 async def list_territories(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all active territories with lead stats."""
+    """List all active territories with lead statistics.
+
+    Returns each territory with its total lead count, new leads,
+    average HVAC score, and number of high-potential leads (score ≥ 70).
+    Ordered alphabetically by territory name.
+    """
     stmt = select(Territory).where(Territory.is_active == True).order_by(Territory.name.asc())
     result = await db.execute(stmt)
     territories = result.scalars().all()
@@ -94,13 +99,18 @@ async def list_territories(
     return output
 
 
-@router.post("", response_model=TerritoryResponse, status_code=201)
+@router.post("", response_model=TerritoryResponse, status_code=201, summary="Create a new territory")
 async def create_territory(
     data: TerritoryCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new territory."""
+    """Create a new geographic territory to scan for HVAC leads.
+
+    Defines a scan area by city, province, and optional postal code
+    with a configurable radius in kilometres. The territory will appear
+    in the dashboard and can be ingested immediately after creation.
+    """
     territory = Territory(
         name=data.name,
         city=data.city,
@@ -114,13 +124,18 @@ async def create_territory(
     return territory
 
 
-@router.get("/{territory_id}", response_model=TerritoryStats)
+@router.get("/{territory_id}", response_model=TerritoryStats, summary="Get territory with lead stats")
 async def get_territory(
     territory_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get territory with lead summary stats."""
+    """Get a single territory with its lead summary statistics.
+
+    Returns territory details along with total lead count, new leads,
+    average HVAC score, and high-potential lead count for that territory.
+    Raises 404 if the territory does not exist.
+    """
     result = await db.execute(select(Territory).where(Territory.id == territory_id))
     territory = result.scalar_one_or_none()
     if not territory:
@@ -166,14 +181,19 @@ async def get_territory(
     )
 
 
-@router.patch("/{territory_id}", response_model=TerritoryResponse)
+@router.patch("/{territory_id}", response_model=TerritoryResponse, summary="Update a territory")
 async def update_territory(
     territory_id: int,
     data: TerritoryUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Update a territory."""
+    """Update an existing territory's properties.
+
+    Supports partial updates — only supplied fields are changed.
+    Allows modifying name, city, province, postal code, radius,
+    and active status. Raises 404 if the territory is not found.
+    """
     result = await db.execute(select(Territory).where(Territory.id == territory_id))
     territory = result.scalar_one_or_none()
     if not territory:
@@ -190,13 +210,18 @@ async def update_territory(
 
 
 
-@router.post("/{territory_id}/ingest")
+@router.post("/{territory_id}/ingest", summary="Run ingestion pipeline")
 async def ingest_territory(
     territory_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Run ingestion pipeline for a territory to find new leads."""
+    """Run the ingestion pipeline for a territory to find new leads.
+
+    Triggers a scan of municipal permit data, business registries,
+    and other configured sources for the given territory. Returns
+    the count of new leads discovered and which sources were queried.
+    """
     from app.services.ingestor import run_ingestion_for_territory
 
     result = await db.execute(select(Territory).where(Territory.id == territory_id))
@@ -214,13 +239,18 @@ async def ingest_territory(
     }
 
 
-@router.delete("/{territory_id}")
+@router.delete("/{territory_id}", summary="Deactivate a territory")
 async def delete_territory(
     territory_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Soft-delete a territory (set is_active=False)."""
+    """Soft-delete a territory by setting it as inactive.
+
+    Sets `is_active` to False so the territory no longer appears
+    in the default active list but retains its data and lead history.
+    Raises 404 if the territory does not exist.
+    """
     result = await db.execute(select(Territory).where(Territory.id == territory_id))
     territory = result.scalar_one_or_none()
     if not territory:

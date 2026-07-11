@@ -17,15 +17,17 @@ from app.api.leads import LeadResponse
 router = APIRouter(prefix="/api/kanban", tags=["kanban"])
 
 
-@router.get("/leads")
+@router.get("/leads", summary="Get leads with per-user kanban status")
 async def get_kanban_leads(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get all leads with per-user status overlay.
+    """Get all leads with per-user kanban board status overlay.
 
-    Returns leads with the user's custom status if set,
-    otherwise falls back to the lead's default status.
+    Returns every lead along with the authenticated user's custom
+    kanban status (new, contacted, qualified, converted, dismissed).
+    Falls back to the lead's default status if the user has not set
+    one. Also returns the list of active territories for filter buttons.
     """
     # Get all leads
     result = await db.execute(
@@ -94,14 +96,20 @@ class KanbanStatusUpdate(BaseModel):
     status: str
 
 
-@router.patch("/leads/{lead_id}")
+@router.patch("/leads/{lead_id}", summary="Set kanban status for a lead")
 async def update_kanban_status(
     lead_id: int,
     data: KanbanStatusUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Set per-user kanban status for a lead. Upserts."""
+    """Set or update the kanban status for a lead (per-user).
+
+    Performs an upsert on the user's custom status for this lead.
+    Accepts status values: new, contacted, qualified, converted,
+    or dismissed. The status is stored per-user, so each team
+    member can manage their own pipeline independently.
+    """
     # Check lead exists
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     if not result.scalar_one_or_none():

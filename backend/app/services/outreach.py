@@ -4,6 +4,7 @@ Uses OpenAI API when available, falls back to template-based generation.
 """
 
 from typing import Optional
+from collections import defaultdict
 
 from app.models.lead import Lead
 from app.models.territory import Territory
@@ -68,45 +69,62 @@ async def draft_outreach_email(
 
 async def generate_brief_summary(
     leads: list[Lead],
-    territory_name: str,
+    territory_name: str = "",
+    territory_map: dict[int, str] = None,
     api_key: str = "",
 ) -> tuple[str, list[int]]:
-    """Generate a brief summary with top lead IDs.
+    """Generate a consolidated daily brief summary.
+
+    If territory_map is provided, breaks down leads per territory.
+    Otherwise treats all leads as one group.
 
     Returns (summary_text, top_lead_ids).
     """
     if not leads:
-        return (
-            f"No leads found for {territory_name}.",
-            [],
-        )
+        summary = "No leads found across any territory. Run a scan first."
+        return summary, []
 
     total = len(leads)
-    avg_score = sum(l.hvac_score for l in leads) / total if total else 0
     scored = sorted(leads, key=lambda x: x.hvac_score, reverse=True)
+    avg_score = sum(l.hvac_score for l in leads) / total if total else 0
     high_potential = [l for l in scored if l.hvac_score >= 70]
-    top_5 = scored[:5]
-    top_ids = [l.id for l in top_5]
+    top_10 = scored[:10]
+    top_ids = [l.id for l in top_10]
 
-    # Build simple, readable summary
     lines = [
-        f"Territory: {territory_name}",
-        f"Leads: {total}  ·  Avg Score: {avg_score:.0f}/100  ·  Hot Leads: {len(high_potential)}",
+        "Daily HVAC Lead Summary",
+        f"Total Leads: {total}  ·  Avg Score Across All: {avg_score:.0f}/100  ·  Hot Leads (Score ≥70): {len(high_potential)}",
         "",
-        "Top Leads to Prioritize:",
     ]
-    for i, l in enumerate(top_5, 1):
-        lines.append(
-            f"  {i}. {l.business_name}  —  Score: {l.hvac_score}  —  {l.city or ''}  —  {l.business_type or 'N/A'}"
-        )
 
-    if high_potential and high_potential != top_5[:len(high_potential)]:
-        remaining = [l for l in high_potential if l not in top_5]
-        if remaining:
-            lines.append("")
-            lines.append("Other Hot Leads:")
-            for l in remaining[:3]:
-                lines.append(f"  • {l.business_name}  —  Score: {l.hvac_score}  —  {l.city or ''}")
+    # Per-territory breakdown
+    if territory_map and len(territory_map) > 1:
+        by_terr = defaultdict(list)
+        for l in leads:
+            by_terr[l.territory_id].append(l)
+        lines.append("Breakdown by Territory:")
+        for tid in sorted(by_terr.keys()):
+            tl = by_terr[tid]
+            tname = territory_map.get(tid, f"Territory {tid}")
+            tavg = sum(l.hvac_score for l in tl) / len(tl)
+            thot = len([l for l in tl if l.hvac_score >= 70])
+            lines.append(f"  {tname:25s}  {len(tl):4d} leads  ·  avg {tavg:.0f}  ·  {thot} hot")
+        lines.append("")
+
+    # Top leads across all territories
+    lines.append("Top 10 Leads to Prioritize (All Territories):")
+    for i, l in enumerate(top_10, 1):
+        city = l.city or ""
+        btype = l.business_type or "N/A"
+        lines.append(f"  {i}. {l.business_name}  —  Score: {l.hvac_score}  —  {city}  —  {btype}")
+
+    # Additional hot leads not in top 10
+    remaining_hot = [l for l in high_potential if l not in scored[:10]]
+    if remaining_hot:
+        lines.append("")
+        lines.append(f"Other Hot Leads ({len(remaining_hot)} more):")
+        for l in remaining_hot[:5]:
+            lines.append(f"  • {l.business_name}  —  Score: {l.hvac_score}  —  {l.city or ''}")
 
     summary = "\n".join(lines)
     return summary, top_ids

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Territory, Lead } from '@/lib/types';
 import { apiGet, apiPost, apiDelete } from '@/lib/api';
+import { exportLeadsCSV } from '@/lib/csv';
 
 function ScoreBadge({ score }: { score: number }) {
   let cls = 'score-low';
@@ -211,6 +212,16 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
               className="dark-pill dark-pill-primary disabled:opacity-50 hover-lift"
             >
               {ingesting ? 'Ingesting...' : 'Run Ingestion'}
+            </button>
+            <button
+              onClick={() => exportLeadsCSV(sortedLeads, `${territory.name.toLowerCase().replace(/\s+/g, '-')}-leads.csv`)}
+              className="dark-pill dark-pill-secondary hover-lift flex items-center gap-1.5"
+              title="Export as CSV"
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 1.5v8M4 7l3 3 3-3M1.5 10v2a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-2"/>
+              </svg>
+              Export CSV
             </button>
             <button
               onClick={handleGenerateBrief}
