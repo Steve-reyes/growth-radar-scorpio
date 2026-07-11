@@ -368,10 +368,8 @@ async def ingest_coquitlam_open_data(
                 if not has_potential:
                     continue
 
-                notes_parts = []
-                if email:
-                    notes_parts.append(f"Email: {email}")
-                notes = "; ".join(notes_parts) if notes_parts else None
+                # Contact info now stored in dedicated fields above
+                notes = None
 
                 lead = Lead(
                     territory_id=territory.id,
@@ -380,6 +378,7 @@ async def ingest_coquitlam_open_data(
                     city="Coquitlam",
                     province="BC",
                     phone=phone or None,
+                    email=email or None,
                     website=None,
                     business_type=business_type or None,
                     hvac_score=dm_score,
@@ -777,33 +776,44 @@ async def run_ingestion_for_territory(
         sources.append("municipal_permit")
         new_leads.extend(municipal_leads)
 
-    # Deduplicate by business_name + city before saving
+    # Fetch existing leads for dedup + backfill
     existing = await db.execute(
-        select(Lead.business_name, Lead.city).where(Lead.territory_id == territory.id)
+        select(Lead).where(Lead.territory_id == territory.id)
     )
-    existing_pairs = {(r.business_name, r.city) for r in existing}
+    existing_by_pair: dict[tuple, Lead] = {}
+    for r in existing.scalars().all():
+        pair = (r.business_name, r.city)
+        existing_by_pair[pair] = r
 
     saved_count = 0
+    backfilled_count = 0
     saved_leads: list[Lead] = []
     for lead in new_leads:
         pair = (lead.business_name, lead.city)
-        if pair not in existing_pairs:
-            db.add(lead)
-            saved_count += 1
-            existing_pairs.add(pair)
-            saved_leads.append(lead)
+        existing_lead = existing_by_pair.get(pair)
+        if existing_lead:
+            # Backfill missing contact info from fresh API data
+            updated = False
+            if lead.email and not existing_lead.email:
+                existing_lead.email = lead.email
+                updated = True
+            if lead.phone and not existing_lead.phone:
+                existing_lead.phone = lead.phone
+            if updated:
+                backfilled_count += 1
+            continue
+        # New lead
+        db.add(lead)
+        saved_count += 1
+        saved_leads.append(lead)
 
     # Flush to get IDs for enrichment
     if saved_leads:
         await db.flush()
 
-        # Skip enrichment during bulk ingestion
-        # Contact info already available from open data (Coquitlam has phone/email)
-        # Individual enrichment can be triggered later per lead
-        pass
-
     return {
         "new_leads": saved_count,
+        "backfilled": backfilled_count,
         "sources": sources,
     }
 
