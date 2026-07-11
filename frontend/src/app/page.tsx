@@ -46,7 +46,7 @@ function ScoreBadge({ score }: { score: number }) {
           className="score-mini-bar-fill"
           style={{
             width: `${score}%`,
-            background: score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444',
+            background: score > 70 ? '#3B82F6' : score > 40 ? '#F59E0B' : '#EF4444',
           }}
         />
       </span>
@@ -194,8 +194,8 @@ export default function Dashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-base font-bold text-[#F1F5F9]">Leads Analytics</h2>
               <div className="flex items-center gap-3">
-                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline font-semibold">Imported →</a>
-                <a href="/leads" className="text-xs text-[#10B981] hover:underline font-semibold">Permits →</a>
+                <a href="/leads-imported" className="text-xs text-[#3B82F6] hover:underline font-semibold">Imported →</a>
+                <a href="/leads" className="text-xs text-[#3B82F6] hover:underline font-semibold">Permits →</a>
               </div>
             </div>
             {loading ? (
@@ -207,8 +207,8 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.15)] rounded-xl p-4 text-center">
-                  <p className="text-2xl font-extrabold text-[#10B981] font-mono">{stats ? (stats.total_leads ?? 0) + totalImported : totalImported}</p>
+                <div className="bg-[rgba(59,130,246,0.08)] border border-[rgba(59,130,246,0.15)] rounded-xl p-4 text-center">
+                  <p className="text-2xl font-extrabold text-[#3B82F6] font-mono">{stats ? (stats.total_leads ?? 0) + totalImported : totalImported}</p>
                   <p className="text-xs text-[#64748B] mt-1">Total All Leads</p>
                 </div>
                 <div className="bg-[rgba(59,130,246,0.08)] border border-[rgba(59,130,246,0.15)] rounded-xl p-4 text-center">
@@ -233,7 +233,7 @@ export default function Dashboard() {
             <div className="dark-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-[#F1F5F9]">Imported</h3>
-                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline">View All →</a>
+                <a href="/leads-imported" className="text-xs text-[#3B82F6] hover:underline">View All →</a>
               </div>
               {loading ? (
                 <div className="space-y-3">
@@ -271,7 +271,7 @@ export default function Dashboard() {
             <div className="dark-card p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-[#F1F5F9]">Permits</h3>
-                <a href="/leads" className="text-xs text-[#10B981] hover:underline">View All →</a>
+                <a href="/leads" className="text-xs text-[#3B82F6] hover:underline">View All →</a>
               </div>
               {loading ? (
                 <div className="space-y-3">
@@ -311,7 +311,7 @@ export default function Dashboard() {
             <div className="dark-card p-5">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-bold text-[#F1F5F9]">Largest Import Lists</h3>
-                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline">View All →</a>
+                <a href="/leads-imported" className="text-xs text-[#3B82F6] hover:underline">View All →</a>
               </div>
               <div className="space-y-2">
                 {[...importBatches]
@@ -411,7 +411,7 @@ export default function Dashboard() {
               </div>
             ) : brief ? (
               <div>
-                <p className="text-sm font-semibold text-[#10B981] mb-1">{brief.title}</p>
+                <p className="text-sm font-semibold text-[#3B82F6] mb-1">{brief.title}</p>
                 <div className="text-sm text-[#94A3B8] leading-relaxed line-clamp-5 whitespace-pre-wrap">
                   {brief.summary
                     .replace(/^#+\s*/gm, '')
@@ -430,11 +430,11 @@ export default function Dashboard() {
                           key={id}
                           onClick={() => handleLeadClick(id)}
                           className="w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg
-                            bg-[rgba(16,185,129,0.06)] border border-[rgba(16,185,129,0.12)]
-                            hover:bg-[rgba(16,185,129,0.12)] hover:border-[rgba(16,185,129,0.25)]
+                            bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.12)]
+                            hover:bg-[rgba(59,130,246,0.12)] hover:border-[rgba(59,130,246,0.25)]
                             transition-all duration-150 cursor-pointer text-left"
                         >
-                          <span className="w-5 h-5 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] 
+                          <span className="w-5 h-5 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] 
                             flex items-center justify-center text-[10px] font-bold font-mono shrink-0">
                             {i + 1}
                           </span>
@@ -443,7 +443,7 @@ export default function Dashboard() {
                           </span>
                           {cached && (
                             <span className={`text-xs font-mono font-bold shrink-0 ${
-                              cached.score > 70 ? 'text-[#10B981]' : cached.score > 40 ? 'text-[#F59E0B]' : 'text-[#EF4444]'
+                              cached.score > 70 ? 'text-[#3B82F6]' : cached.score > 40 ? 'text-[#F59E0B]' : 'text-[#EF4444]'
                             }`}>
                               {cached.score}
                             </span>
@@ -511,7 +511,7 @@ export default function Dashboard() {
             <div className="dark-card p-5">
               <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Avg HVAC Score</p>
               <div className="flex items-end gap-3">
-                <p className="text-3xl font-extrabold text-[#10B981] font-mono">{stats ? (stats.average_hvac_score ?? 0).toFixed(1) : '0'}</p>
+                <p className="text-3xl font-extrabold text-[#3B82F6] font-mono">{stats ? (stats.average_hvac_score ?? 0).toFixed(1) : '0'}</p>
                 <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M1 7L5 3L9 7" />
@@ -552,19 +552,19 @@ export default function Dashboard() {
               {selectedLead.phone && (
                 <div>
                   <span className="text-[#64748B]">Phone:</span>{' '}
-                  <a href={`tel:${selectedLead.phone}`} className="text-[#10B981] hover:underline">{selectedLead.phone}</a>
+                  <a href={`tel:${selectedLead.phone}`} className="text-[#3B82F6] hover:underline">{selectedLead.phone}</a>
                 </div>
               )}
               {selectedLead.email && (
                 <div>
                   <span className="text-[#64748B]">Email:</span>{' '}
-                  <a href={`mailto:${selectedLead.email}`} className="text-[#10B981] hover:underline">{selectedLead.email}</a>
+                  <a href={`mailto:${selectedLead.email}`} className="text-[#3B82F6] hover:underline">{selectedLead.email}</a>
                 </div>
               )}
               {selectedLead.website && (
                 <div>
                   <span className="text-[#64748B]">Website:</span>{' '}
-                  <a href={selectedLead.website} target="_blank" className="text-[#10B981] hover:underline">
+                  <a href={selectedLead.website} target="_blank" className="text-[#3B82F6] hover:underline">
                     {selectedLead.website}
                   </a>
                 </div>

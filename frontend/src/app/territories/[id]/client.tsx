@@ -19,7 +19,7 @@ function ScoreBadge({ score }: { score: number }) {
           className="score-mini-bar-fill"
           style={{
             width: `${score}%`,
-            background: score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444',
+            background: score > 70 ? '#3B82F6' : score > 40 ? '#F59E0B' : '#EF4444',
           }}
         />
       </span>
@@ -164,13 +164,13 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
     return (
       <div className="dark-card p-8 text-center">
         <p className="text-[#EF4444] font-semibold">Territory not found</p>
-        <Link href="/territories" className="text-[#10B981] text-sm mt-2 inline-block hover:underline">Back to territories</Link>
+        <Link href="/territories" className="text-[#3B82F6] text-sm mt-2 inline-block hover:underline">Back to territories</Link>
       </div>
     );
   }
 
   const avgScoreColor = territory.avg_score
-    ? territory.avg_score > 70 ? '#10B981' : territory.avg_score > 40 ? '#F59E0B' : '#EF4444'
+    ? territory.avg_score > 70 ? '#3B82F6' : territory.avg_score > 40 ? '#F59E0B' : '#EF4444'
     : '#64748B';
 
   return (
@@ -190,11 +190,11 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
               <h1 className="text-2xl font-bold text-[#F1F5F9]">{territory.name}</h1>
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                 territory.is_active
-                  ? 'bg-[rgba(16,185,129,0.15)] text-[#10B981]'
+                  ? 'bg-[rgba(59,130,246,0.15)] text-[#3B82F6]'
                   : 'bg-[rgba(100,116,139,0.15)] text-[#64748B]'
               }`}>
                 <span className={`w-1.5 h-1.5 rounded-full ${
-                  territory.is_active ? 'bg-[#10B981] shadow-[0_0_4px_rgba(16,185,129,0.5)]' : 'bg-[#64748B]'
+                  territory.is_active ? 'bg-[#3B82F6] shadow-[0_0_4px_rgba(59,130,246,0.5)]' : 'bg-[#64748B]'
                 }`} />
                 {territory.is_active ? 'Active' : 'Inactive'}
               </span>
@@ -286,7 +286,7 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
             onChange={e => setFilterMinScore(Number(e.target.value))}
             className="w-20"
           />
-          <span className="text-sm font-semibold text-[#10B981] font-mono w-7 text-right">{filterMinScore}</span>
+          <span className="text-sm font-semibold text-[#3B82F6] font-mono w-7 text-right">{filterMinScore}</span>
         </div>
       </div>
 
@@ -294,44 +294,44 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
       <div className="dark-card overflow-hidden">
         <div className="px-5 py-4 border-b border-[rgba(148,163,184,0.06)]">
           <h2 className="text-base font-bold text-[#F1F5F9]">
-            Leads <span className="font-mono text-[#10B981]">({sortedLeads.length})</span>
+            Leads <span className="font-mono text-[#3B82F6]">({sortedLeads.length})</span>
           </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="dark-table">
             <thead>
               <tr>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_name')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_name')}>
                   Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_name')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('phone')}>
                   Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('email')}>
                   Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('licence_fee')}>
                   Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('num_employees')}>
                   Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('city')}>
                   City<span className="text-[#64748B] text-xs ml-1">{sortArrow('city')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_type')}>
                   Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('hvac_score')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('hvac_score')}>
                   Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('hvac_score')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('status')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('status')}>
                   Status<span className="text-[#64748B] text-xs ml-1">{sortArrow('status')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('lead_source')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('lead_source')}>
                   Source<span className="text-[#64748B] text-xs ml-1">{sortArrow('lead_source')}</span>
                 </th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('discovered_at')}>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('discovered_at')}>
                   Discovered<span className="text-[#64748B] text-xs ml-1">{sortArrow('discovered_at')}</span>
                 </th>
               </tr>
@@ -347,12 +347,12 @@ export default function TerritoryDetailClient({ params }: { params: Promise<{ id
                     <td className="font-semibold text-[#F1F5F9]">{lead.business_name}</td>
                     <td className="text-sm text-[#94A3B8]">
                       {lead.phone ? (
-                        <a href={`tel:${lead.phone}`} className="hover:text-[#10B981] transition-colors">{lead.phone}</a>
+                        <a href={`tel:${lead.phone}`} className="hover:text-[#3B82F6] transition-colors">{lead.phone}</a>
                       ) : '-'}
                     </td>
                     <td className="text-sm text-[#94A3B8]">
                       {lead.email ? (
-                        <a href={`mailto:${lead.email}`} className="hover:text-[#10B981] transition-colors">{lead.email}</a>
+                        <a href={`mailto:${lead.email}`} className="hover:text-[#3B82F6] transition-colors">{lead.email}</a>
                       ) : '-'}
                     </td>
                     <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>

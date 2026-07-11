@@ -173,7 +173,7 @@ export default function BriefsPage() {
               <div
                 key={brief.id}
                 className={`dark-card overflow-hidden transition-all duration-300 ${
-                  isLatest ? 'ring-1 ring-[rgba(16,185,129,0.25)] ring-offset-1 ring-offset-[#0F1117]' : ''
+                  isLatest ? 'ring-1 ring-[rgba(59,130,246,0.25)] ring-offset-1 ring-offset-[#0F1117]' : ''
                 }`}
               >
                 <button
@@ -182,10 +182,10 @@ export default function BriefsPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-[#F1F5F9] group-hover:text-[#10B981] transition-colors">{brief.title}</h3>
+                      <h3 className="font-bold text-[#F1F5F9] group-hover:text-[#3B82F6] transition-colors">{brief.title}</h3>
                       {isLatest && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#10B981] bg-[rgba(16,185,129,0.12)] px-2.5 py-0.5 rounded-full">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] shadow-[0_0_4px_rgba(16,185,129,0.5)]" />
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#3B82F6] bg-[rgba(59,130,246,0.12)] px-2.5 py-0.5 rounded-full">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] shadow-[0_0_4px_rgba(59,130,246,0.5)]" />
                           Latest
                         </span>
                       )}
@@ -208,7 +208,7 @@ export default function BriefsPage() {
                   </div>
                   <svg
                     className={`w-5 h-5 text-[#64748B] mt-1 transition-all duration-300 shrink-0 ${
-                      isExpanded ? 'rotate-180 text-[#10B981]' : 'group-hover:text-[#94A3B8]'
+                      isExpanded ? 'rotate-180 text-[#3B82F6]' : 'group-hover:text-[#94A3B8]'
                     }`}
                     fill="none" stroke="currentColor" viewBox="0 0 24 24"
                   >
@@ -231,7 +231,7 @@ export default function BriefsPage() {
                         <div className="mt-3 flex gap-4">
                           {[
                             { label: 'Total Leads', value: statLine.total, color: 'text-[#94A3B8]' },
-                            { label: 'Avg Score', value: statLine.avg, color: 'text-[#10B981]' },
+                            { label: 'Avg Score', value: statLine.avg, color: 'text-[#3B82F6]' },
                             { label: 'Hot Leads', value: statLine.hot, color: 'text-[#F59E0B]' },
                           ].map((s, i) => (
                             <div key={i} className="bg-[rgba(148,163,184,0.06)] rounded-lg px-4 py-2.5 flex-1 text-center">
@@ -254,23 +254,23 @@ export default function BriefsPage() {
                                   key={leadId || i}
                                   onClick={(e) => { e.stopPropagation(); if (leadId) handleLeadClick(leadId); }}
                                   className="w-full flex items-center gap-3 px-4 py-3 rounded-lg
-                                    bg-[rgba(16,185,129,0.06)] border border-[rgba(16,185,129,0.12)]
-                                    hover:bg-[rgba(16,185,129,0.12)] hover:border-[rgba(16,185,129,0.25)]
+                                    bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.12)]
+                                    hover:bg-[rgba(59,130,246,0.12)] hover:border-[rgba(59,130,246,0.25)]
                                     transition-all duration-150 cursor-pointer text-left group/lead"
                                 >
-                                  <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] 
+                                  <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] 
                                     flex items-center justify-center text-xs font-bold font-mono shrink-0">
                                     {i + 1}
                                   </span>
                                   <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-[#F1F5F9] group-hover/lead:text-[#10B981] transition-colors truncate">
+                                    <p className="text-sm font-semibold text-[#F1F5F9] group-hover/lead:text-[#3B82F6] transition-colors truncate">
                                       {cached ? cached.name : `Loading...`}
                                     </p>
                                     {cached && (
                                       <p className="text-xs text-[#64748B] mt-0.5">{cached.city} · Score: {cached.score}</p>
                                     )}
                                   </div>
-                                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#64748B] group-hover/lead:text-[#10B981] shrink-0">
+                                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#64748B] group-hover/lead:text-[#3B82F6] shrink-0">
                                     <path d="M5 3l4 4-4 4" />
                                   </svg>
                                 </button>
@@ -359,11 +359,11 @@ export default function BriefsPage() {
               )}
               {selectedLead.phone && (
                 <div><span className="text-[#64748B]">Phone:</span>{' '}
-                <a href={`tel:${selectedLead.phone}`} className="text-[#10B981] hover:underline">{selectedLead.phone}</a></div>
+                <a href={`tel:${selectedLead.phone}`} className="text-[#3B82F6] hover:underline">{selectedLead.phone}</a></div>
               )}
               {selectedLead.email && (
                 <div><span className="text-[#64748B]">Email:</span>{' '}
-                <a href={`mailto:${selectedLead.email}`} className="text-[#10B981] hover:underline">{selectedLead.email}</a></div>
+                <a href={`mailto:${selectedLead.email}`} className="text-[#3B82F6] hover:underline">{selectedLead.email}</a></div>
               )}
               {(selectedLead.licence_fee || selectedLead.num_employees) && (
                 <div className="col-span-2 flex gap-4">
@@ -378,7 +378,7 @@ export default function BriefsPage() {
               {selectedLead.website && (
                 <div>
                   <span className="text-[#64748B]">Website:</span>{' '}
-                  <a href={selectedLead.website} target="_blank" className="text-[#10B981] hover:underline">{selectedLead.website}</a>
+                  <a href={selectedLead.website} target="_blank" className="text-[#3B82F6] hover:underline">{selectedLead.website}</a>
                 </div>
               )}
               <div><span className="text-[#64748B]">Type:</span> {selectedLead.business_type || '-'}</div>

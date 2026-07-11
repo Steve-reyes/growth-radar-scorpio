@@ -112,8 +112,8 @@ export default function Navigation() {
       <div className="h-16 flex items-center px-5 border-b border-[rgba(148,163,184,0.06)]">
         <Link href="/" className="flex items-center gap-3">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <circle cx="14" cy="14" r="12" stroke="#10B981" strokeWidth="2" fill="none" />
-            <path d="M14 6 L14 14 L20 14" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="14" cy="14" r="12" stroke="#3B82F6" strokeWidth="2" fill="none" />
+            <path d="M14 6 L14 14 L20 14" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           <span className="text-lg font-bold tracking-tight gradient-text">
             Growth Radar
@@ -163,7 +163,7 @@ export default function Navigation() {
         {isAuthenticated && user ? (
           <div className="space-y-2">
             <div className="flex items-center gap-3 group cursor-pointer transition-all hover:bg-[rgba(148,163,184,0.04)] rounded-lg p-2 -mx-1">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[rgba(16,185,129,0.2)]">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3B82F6] to-[#2563EB] flex items-center justify-center flex-shrink-0 shadow-lg shadow-[rgba(59,130,246,0.2)]">
                 <span className="text-xs font-bold text-white">
                   {user.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
                 </span>
@@ -183,7 +183,7 @@ export default function Navigation() {
         ) : (
           <Link
             href="/login"
-            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold transition-all"
+            className="flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-all"
           >
             <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M15 8l4 4-4 4" />

@@ -14,7 +14,7 @@ function ScoreBadge({ score }: { score: number }) {
     <span className="score-mini-bar">
       <span className={`score-badge ${cls}`}>{score}</span>
       <span className="score-mini-bar-track">
-        <span className="score-mini-bar-fill" style={{ width: `${score}%`, background: score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444' }} />
+        <span className="score-mini-bar-fill" style={{ width: `${score}%`, background: score > 70 ? '#3B82F6' : score > 40 ? '#F59E0B' : '#EF4444' }} />
       </span>
     </span>
   );
@@ -98,19 +98,19 @@ function TerritoryLeadsView({ territoryId, onBack }: { territoryId: string; onBa
     return (
       <div className="dark-card p-8 text-center">
         <p className="text-[#EF4444] font-semibold">Territory not found</p>
-        <button onClick={onBack} className="text-[#10B981] text-sm mt-2 inline-block hover:underline cursor-pointer">Back to territories</button>
+        <button onClick={onBack} className="text-[#3B82F6] text-sm mt-2 inline-block hover:underline cursor-pointer">Back to territories</button>
       </div>
     );
   }
 
   const avgScoreColor = territory.avg_score
-    ? territory.avg_score > 70 ? '#10B981' : territory.avg_score > 40 ? '#F59E0B' : '#EF4444'
+    ? territory.avg_score > 70 ? '#3B82F6' : territory.avg_score > 40 ? '#F59E0B' : '#EF4444'
     : '#64748B';
 
   return (
     <div>
       <div className="page-breadcrumb mb-2">
-        <button onClick={onBack} className="text-[#10B981] hover:underline cursor-pointer">Territories</button>
+        <button onClick={onBack} className="text-[#3B82F6] hover:underline cursor-pointer">Territories</button>
         <span className="page-breadcrumb-sep">/</span>
         <span className="text-[#94A3B8]">{territory.name}</span>
       </div>
@@ -154,29 +154,29 @@ function TerritoryLeadsView({ territoryId, onBack }: { territoryId: string; onBa
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#64748B] font-semibold uppercase tracking-wide">Min Score:</span>
           <input type="range" min={0} max={100} value={filterMinScore} onChange={e => setFilterMinScore(Number(e.target.value))} className="w-20" />
-          <span className="text-sm font-semibold text-[#10B981] font-mono w-7 text-right">{filterMinScore}</span>
+          <span className="text-sm font-semibold text-[#3B82F6] font-mono w-7 text-right">{filterMinScore}</span>
         </div>
       </div>
 
       <div className="dark-card overflow-hidden">
         <div className="px-5 py-4 border-b border-[rgba(148,163,184,0.06)]">
-          <h2 className="text-base font-bold text-[#F1F5F9]">Leads <span className="font-mono text-[#10B981]">({sortedLeads.length})</span></h2>
+          <h2 className="text-base font-bold text-[#F1F5F9]">Leads <span className="font-mono text-[#3B82F6]">({sortedLeads.length})</span></h2>
         </div>
         <div className="overflow-x-auto">
           <table className="dark-table">
             <thead>
               <tr>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_name')}>Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_name')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>City<span className="text-[#64748B] text-xs ml-1">{sortArrow('city')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('hvac_score')}>Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('hvac_score')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('status')}>Status<span className="text-[#64748B] text-xs ml-1">{sortArrow('status')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('lead_source')}>Source<span className="text-[#64748B] text-xs ml-1">{sortArrow('lead_source')}</span></th>
-                <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('discovered_at')}>Disc.<span className="text-[#64748B] text-xs ml-1">{sortArrow('discovered_at')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_name')}>Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_name')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('phone')}>Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('email')}>Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('licence_fee')}>Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('num_employees')}>Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('city')}>City<span className="text-[#64748B] text-xs ml-1">{sortArrow('city')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_type')}>Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('hvac_score')}>Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('hvac_score')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('status')}>Status<span className="text-[#64748B] text-xs ml-1">{sortArrow('status')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('lead_source')}>Source<span className="text-[#64748B] text-xs ml-1">{sortArrow('lead_source')}</span></th>
+                <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('discovered_at')}>Disc.<span className="text-[#64748B] text-xs ml-1">{sortArrow('discovered_at')}</span></th>
               </tr>
             </thead>
             <tbody>
@@ -185,8 +185,8 @@ function TerritoryLeadsView({ territoryId, onBack }: { territoryId: string; onBa
               ) : sortedLeads.map(lead => (
                 <tr key={lead.id} className="transition-colors">
                   <td className="font-semibold text-[#F1F5F9]">{lead.business_name}</td>
-                  <td className="text-sm text-[#94A3B8]">{lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#10B981] transition-colors">{lead.phone}</a> : '-'}</td>
-                  <td className="text-sm text-[#94A3B8]">{lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981] transition-colors">{lead.email}</a> : '-'}</td>
+                  <td className="text-sm text-[#94A3B8]">{lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#3B82F6] transition-colors">{lead.phone}</a> : '-'}</td>
+                  <td className="text-sm text-[#94A3B8]">{lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#3B82F6] transition-colors">{lead.email}</a> : '-'}</td>
                   <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
                   <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
                   <td className="text-[#94A3B8]">{lead.city || '-'}</td>
@@ -291,7 +291,7 @@ export function TerritoriesPage() {
 
   const avgScoreColor = (score: number | undefined) => {
     if (!score) return '#64748B';
-    if (score > 70) return '#10B981';
+    if (score > 70) return '#3B82F6';
     if (score > 40) return '#F59E0B';
     return '#EF4444';
   };
@@ -348,16 +348,16 @@ export function TerritoriesPage() {
                 className="block"
               >
               <div className="flex items-start justify-between mb-3">
-                <h3 className="font-bold text-lg text-[#F1F5F9] group-hover:text-[#10B981] transition-colors">
+                <h3 className="font-bold text-lg text-[#F1F5F9] group-hover:text-[#3B82F6] transition-colors">
                   {t.name}
                 </h3>
                 <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                   t.is_active
-                    ? 'bg-[rgba(16,185,129,0.15)] text-[#10B981]'
+                    ? 'bg-[rgba(59,130,246,0.15)] text-[#3B82F6]'
                     : 'bg-[rgba(100,116,139,0.15)] text-[#64748B]'
                 }`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${
-                    t.is_active ? 'bg-[#10B981] shadow-[0_0_4px_rgba(16,185,129,0.5)]' : 'bg-[#64748B]'
+                    t.is_active ? 'bg-[#3B82F6] shadow-[0_0_4px_rgba(59,130,246,0.5)]' : 'bg-[#64748B]'
                   }`} />
                   {t.is_active ? 'Active' : 'Inactive'}
                 </span>
@@ -382,7 +382,7 @@ export function TerritoriesPage() {
                   <button
                     onClick={(e) => handleSearch(t.id, e)}
                     disabled={searchingId === t.id}
-                    className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[rgba(16,185,129,0.15)] text-[#10B981] hover:bg-[rgba(16,185,129,0.25)] transition-all disabled:opacity-50"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[rgba(59,130,246,0.15)] text-[#3B82F6] hover:bg-[rgba(59,130,246,0.25)] transition-all disabled:opacity-50"
                   >
                     {searchingId === t.id ? 'Searching...' : 'Search'}
                   </button>

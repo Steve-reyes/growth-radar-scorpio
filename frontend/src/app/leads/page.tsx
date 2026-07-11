@@ -17,7 +17,7 @@ function ScoreBadge({ score }: { score: number }) {
           className="score-mini-bar-fill"
           style={{
             width: `${score}%`,
-            background: score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444',
+            background: score > 70 ? '#3B82F6' : score > 40 ? '#F59E0B' : '#EF4444',
           }}
         />
       </span>
@@ -35,7 +35,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 const CITY_COLORS = [
-  { bg: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.15)', dot: '#10B981' },
+  { bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.15)', dot: '#3B82F6' },
   { bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.15)', dot: '#3B82F6' },
   { bg: 'rgba(139,92,246,0.06)', border: 'rgba(139,92,246,0.15)', dot: '#8B5CF6' },
   { bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.15)', dot: '#F59E0B' },
@@ -248,7 +248,7 @@ export default function LeadsPage() {
               onChange={e => setMinScore(Number(e.target.value))}
               className="w-20"
             />
-            <span className="text-sm font-semibold text-[#10B981] font-mono w-7 text-right">{minScore}</span>
+            <span className="text-sm font-semibold text-[#3B82F6] font-mono w-7 text-right">{minScore}</span>
           </div>
           <button type="submit" className="dark-pill dark-pill-primary h-[42px] text-sm">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5">
@@ -280,7 +280,7 @@ export default function LeadsPage() {
         <div className="space-y-4">
           {/* Expand/Collapse All */}
           <div className="flex gap-2">
-            <button onClick={expandAll} className="text-xs font-semibold text-[#10B981] hover:underline">Expand All</button>
+            <button onClick={expandAll} className="text-xs font-semibold text-[#3B82F6] hover:underline">Expand All</button>
             <span className="text-[#64748B]">·</span>
             <button onClick={collapseAll} className="text-xs font-semibold text-[#64748B] hover:text-[#F1F5F9]">Collapse All</button>
           </div>
@@ -328,7 +328,7 @@ export default function LeadsPage() {
                   </button>
                   <button
                     onClick={(e) => { e.stopPropagation(); exportLeadsCSV(cityLeads, `${city.toLowerCase()}-leads.csv`); }}
-                    className="text-xs font-semibold text-[#10B981] hover:text-[#34D399] flex items-center gap-1 px-2 py-1 rounded hover:bg-[rgba(16,185,129,0.1)] transition-all"
+                    className="text-xs font-semibold text-[#3B82F6] hover:text-[#60A5FA] flex items-center gap-1 px-2 py-1 rounded hover:bg-[rgba(59,130,246,0.1)] transition-all"
                     title={`Export ${city} leads as CSV`}
                   >
                     <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -344,34 +344,34 @@ export default function LeadsPage() {
                     <table className="dark-table">
                       <thead>
                         <tr>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_name')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_name')}>
                             Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_name')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('phone')}>
                             Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('email')}>
                             Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('licence_fee')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('licence_fee')}>
                             Fee<span className="text-[#64748B] text-xs ml-1">{sortArrow('licence_fee')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none text-right" onClick={() => handleSort('num_employees')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none text-right" onClick={() => handleSort('num_employees')}>
                             Emp<span className="text-[#64748B] text-xs ml-1">{sortArrow('num_employees')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('business_type')}>
                             Type<span className="text-[#64748B] text-xs ml-1">{sortArrow('business_type')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('hvac_score')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('hvac_score')}>
                             Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('hvac_score')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('lead_source')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('lead_source')}>
                             Source<span className="text-[#64748B] text-xs ml-1">{sortArrow('lead_source')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('status')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('status')}>
                             Status<span className="text-[#64748B] text-xs ml-1">{sortArrow('status')}</span>
                           </th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('discovered_at')}>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('discovered_at')}>
                             Discovered<span className="text-[#64748B] text-xs ml-1">{sortArrow('discovered_at')}</span>
                           </th>
                         </tr>
@@ -385,10 +385,10 @@ export default function LeadsPage() {
                           >
                             <td className="font-semibold text-[#F1F5F9]">{lead.business_name}</td>
                             <td className="text-sm text-[#94A3B8]">
-                              {lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#10B981]">{lead.phone}</a> : '-'}
+                              {lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#3B82F6]">{lead.phone}</a> : '-'}
                             </td>
                             <td className="text-sm text-[#94A3B8]">
-                              {lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981]">{lead.email}</a> : '-'}
+                              {lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#3B82F6]">{lead.email}</a> : '-'}
                             </td>
                             <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
                             <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
@@ -437,13 +437,13 @@ export default function LeadsPage() {
               {selectedLead.phone && (
                 <div>
                   <span className="text-[#64748B]">Phone:</span>{' '}
-                  <a href={`tel:${selectedLead.phone}`} className="text-[#10B981] hover:underline">{selectedLead.phone}</a>
+                  <a href={`tel:${selectedLead.phone}`} className="text-[#3B82F6] hover:underline">{selectedLead.phone}</a>
                 </div>
               )}
               {selectedLead.email && (
                 <div>
                   <span className="text-[#64748B]">Email:</span>{' '}
-                  <a href={`mailto:${selectedLead.email}`} className="text-[#10B981] hover:underline">{selectedLead.email}</a>
+                  <a href={`mailto:${selectedLead.email}`} className="text-[#3B82F6] hover:underline">{selectedLead.email}</a>
                 </div>
               )}
               {(selectedLead.licence_fee || selectedLead.num_employees) && (
@@ -459,7 +459,7 @@ export default function LeadsPage() {
               {selectedLead.website && (
                 <div>
                   <span className="text-[#64748B]">Website:</span>{' '}
-                  <a href={selectedLead.website} target="_blank" className="text-[#10B981] hover:underline">
+                  <a href={selectedLead.website} target="_blank" className="text-[#3B82F6] hover:underline">
                     {selectedLead.website}
                   </a>
                 </div>
@@ -486,7 +486,7 @@ export default function LeadsPage() {
                     key={s}
                     onClick={() => handleStatusUpdate(selectedLead.id, s)}
                     className={`status-badge status-${s} cursor-pointer transition-all ${
-                      selectedLead.status === s ? 'ring-2 ring-[#10B981] ring-offset-2 ring-offset-[#1A1D27]' : 'opacity-60 hover:opacity-100'
+                      selectedLead.status === s ? 'ring-2 ring-[#3B82F6] ring-offset-2 ring-offset-[#1A1D27]' : 'opacity-60 hover:opacity-100'
                     }`}
                   >
                     <span className={`status-dot status-dot-${s}`} />

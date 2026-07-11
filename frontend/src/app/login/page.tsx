@@ -34,8 +34,8 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-3">
             <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="12" stroke="#10B981" strokeWidth="2" fill="none" />
-              <path d="M14 6 L14 14 L20 14" stroke="#10B981" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <circle cx="14" cy="14" r="12" stroke="#3B82F6" strokeWidth="2" fill="none" />
+              <path d="M14 6 L14 14 L20 14" stroke="#3B82F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="text-2xl font-bold gradient-text">Growth Radar</span>
           </Link>
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 placeholder="you@example.com"
                 required
                 className="w-full px-3 py-2.5 rounded-lg bg-[rgba(148,163,184,0.06)] border border-[rgba(148,163,184,0.12)]
-                  text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all"
+                  text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
               />
             </div>
             <div>
@@ -73,13 +73,13 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
                 className="w-full px-3 py-2.5 rounded-lg bg-[rgba(148,163,184,0.06)] border border-[rgba(148,163,184,0.12)]
-                  text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] transition-all"
+                  text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg bg-[#10B981] hover:bg-[#059669] disabled:opacity-50
+              className="w-full py-2.5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] disabled:opacity-50
                 text-white text-sm font-semibold transition-all duration-150"
             >
               {loading ? 'Signing in...' : 'Sign in'}

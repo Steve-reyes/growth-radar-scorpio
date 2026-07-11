@@ -45,7 +45,7 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
       <span className="score-mini-bar-track">
         <span className="score-mini-bar-fill" style={{
           width: `${Math.min(s, 100)}%`,
-          background: s > 70 ? '#10B981' : s > 40 ? '#F59E0B' : '#EF4444',
+          background: s > 70 ? '#3B82F6' : s > 40 ? '#F59E0B' : '#EF4444',
         }} />
       </span>
     </span>
@@ -62,7 +62,7 @@ function getPhone(l: ImportLead): string { return l.enrichedPhone || l.phone || 
 function getEmail(l: ImportLead): string { return l.enrichedEmail || l.email || ''; }
 
 const CITY_COLORS = [
-  { bg: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.15)', dot: '#10B981' },
+  { bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.15)', dot: '#3B82F6' },
   { bg: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.15)', dot: '#3B82F6' },
   { bg: 'rgba(139,92,246,0.06)', border: 'rgba(139,92,246,0.15)', dot: '#8B5CF6' },
   { bg: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.15)', dot: '#F59E0B' },
@@ -329,7 +329,7 @@ export default function LeadsImportedPage() {
           <div className="flex items-center gap-2">
             <label className="text-xs font-semibold text-[#64748B] whitespace-nowrap">Min Score:</label>
             <input type="range" min={0} max={100} value={minScore} onChange={e => setMinScore(Number(e.target.value))} className="w-20" />
-            <span className="text-sm font-semibold text-[#10B981] font-mono w-7 text-right">{minScore}</span>
+            <span className="text-sm font-semibold text-[#3B82F6] font-mono w-7 text-right">{minScore}</span>
           </div>
         </form>
       </div>
@@ -352,7 +352,7 @@ export default function LeadsImportedPage() {
       ) : (
         <div className="space-y-4">
           <div className="flex gap-2">
-            <button onClick={expandAll} className="text-xs font-semibold text-[#10B981] hover:underline">Expand All</button>
+            <button onClick={expandAll} className="text-xs font-semibold text-[#3B82F6] hover:underline">Expand All</button>
             <span className="text-[#64748B]">·</span>
             <button onClick={collapseAll} className="text-xs font-semibold text-[#64748B] hover:text-[#F1F5F9]">Collapse All</button>
           </div>
@@ -390,13 +390,13 @@ export default function LeadsImportedPage() {
                     <table className="dark-table">
                       <thead>
                         <tr>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('businessName')}>Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('businessName')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('website')}>Website<span className="text-[#64748B] text-xs ml-1">{sortArrow('website')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('rating')}>Rating<span className="text-[#64748B] text-xs ml-1">{sortArrow('rating')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('reviewCount')}>Reviews<span className="text-[#64748B] text-xs ml-1">{sortArrow('reviewCount')}</span></th>
-                          <th className="cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('score')}>Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('score')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('businessName')}>Business<span className="text-[#64748B] text-xs ml-1">{sortArrow('businessName')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('phone')}>Phone<span className="text-[#64748B] text-xs ml-1">{sortArrow('phone')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('email')}>Email<span className="text-[#64748B] text-xs ml-1">{sortArrow('email')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('website')}>Website<span className="text-[#64748B] text-xs ml-1">{sortArrow('website')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('rating')}>Rating<span className="text-[#64748B] text-xs ml-1">{sortArrow('rating')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('reviewCount')}>Reviews<span className="text-[#64748B] text-xs ml-1">{sortArrow('reviewCount')}</span></th>
+                          <th className="cursor-pointer hover:text-[#3B82F6] select-none" onClick={() => handleSort('score')}>Score<span className="text-[#64748B] text-xs ml-1">{sortArrow('score')}</span></th>
                           <th className="w-10"></th>
                         </tr>
                       </thead>
@@ -404,9 +404,9 @@ export default function LeadsImportedPage() {
                         {sortLeads(batchLeads).map(lead => (
                           <tr key={lead._key} className="transition-colors cursor-pointer" onClick={() => setSelectedLead(lead)}>
                             <td className="font-semibold text-[#F1F5F9]">{getName(lead)}</td>
-                            <td className="text-sm text-[#94A3B8]">{getPhone(lead) ? <a href={`tel:${getPhone(lead)}`} className="hover:text-[#10B981]">{getPhone(lead)}</a> : '-'}</td>
-                            <td className="text-sm text-[#94A3B8]">{getEmail(lead) ? <a href={`mailto:${getEmail(lead)}`} className="hover:text-[#10B981]">{getEmail(lead)}</a> : '-'}</td>
-                            <td className="text-sm text-[#94A3B8] max-w-[150px] truncate">{lead.website ? <a href={lead.website} target="_blank" className="hover:text-[#10B981]">{lead.website.replace(/^https?:\/\//, '').substring(0, 25)}</a> : '-'}</td>
+                            <td className="text-sm text-[#94A3B8]">{getPhone(lead) ? <a href={`tel:${getPhone(lead)}`} className="hover:text-[#3B82F6]">{getPhone(lead)}</a> : '-'}</td>
+                            <td className="text-sm text-[#94A3B8]">{getEmail(lead) ? <a href={`mailto:${getEmail(lead)}`} className="hover:text-[#3B82F6]">{getEmail(lead)}</a> : '-'}</td>
+                            <td className="text-sm text-[#94A3B8] max-w-[150px] truncate">{lead.website ? <a href={lead.website} target="_blank" className="hover:text-[#3B82F6]">{lead.website.replace(/^https?:\/\//, '').substring(0, 25)}</a> : '-'}</td>
                             <td className="text-sm text-[#F59E0B]">{lead.rating ? `⭐ ${lead.rating}` : '-'}</td>
                             <td className="text-sm text-[#94A3B8]">{lead.reviewCount ?? '-'}</td>
                             <td className="text-sm text-[#64748B]">{lead._batchName}</td>
@@ -445,9 +445,9 @@ export default function LeadsImportedPage() {
             </div>
             <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
               {selectedLead.address && <div className="col-span-2"><span className="text-[#64748B]">Address:</span> {selectedLead.address}</div>}
-              {getPhone(selectedLead) && <div><span className="text-[#64748B]">Phone:</span> <a href={`tel:${getPhone(selectedLead)}`} className="text-[#10B981] hover:underline">{getPhone(selectedLead)}</a></div>}
-              {getEmail(selectedLead) && <div><span className="text-[#64748B]">Email:</span> <a href={`mailto:${getEmail(selectedLead)}`} className="text-[#10B981] hover:underline">{getEmail(selectedLead)}</a></div>}
-              {selectedLead.website && <div><span className="text-[#64748B]">Website:</span> <a href={selectedLead.website} target="_blank" className="text-[#10B981] hover:underline">{selectedLead.website}</a></div>}
+              {getPhone(selectedLead) && <div><span className="text-[#64748B]">Phone:</span> <a href={`tel:${getPhone(selectedLead)}`} className="text-[#3B82F6] hover:underline">{getPhone(selectedLead)}</a></div>}
+              {getEmail(selectedLead) && <div><span className="text-[#64748B]">Email:</span> <a href={`mailto:${getEmail(selectedLead)}`} className="text-[#3B82F6] hover:underline">{getEmail(selectedLead)}</a></div>}
+              {selectedLead.website && <div><span className="text-[#64748B]">Website:</span> <a href={selectedLead.website} target="_blank" className="text-[#3B82F6] hover:underline">{selectedLead.website}</a></div>}
               {selectedLead.rating && <div><span className="text-[#64748B]">Rating:</span> ⭐ {selectedLead.rating} {selectedLead.reviewCount ? `(${selectedLead.reviewCount} reviews)` : ''}</div>}
               <div><span className="text-[#64748B]">Batch:</span> {selectedLead._batchName}</div>
               {(selectedLead.categories?.length ?? 0) > 0 && <div className="col-span-2"><span className="text-[#64748B]">Categories:</span> {selectedLead.categories?.join(', ')}</div>}

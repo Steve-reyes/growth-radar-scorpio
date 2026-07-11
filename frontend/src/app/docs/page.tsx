@@ -30,12 +30,12 @@ export default function DocsPage() {
             Here&apos;s how to go from login to your first hot lead in five minutes:
           </p>
           <ol className="list-decimal list-inside text-[#94A3B8] space-y-2">
-            <li><strong className="text-[#10B981]">Log in</strong> with credentials from your admin — all features unlock instantly</li>
-            <li><strong className="text-[#10B981]">Check your Dashboard</strong> for an overview of scores and recent imports</li>
-            <li><strong className="text-[#10B981]">Set up a Territory</strong> — pick a city, run an ingestion scan</li>
-            <li><strong className="text-[#10B981]">Browse Leads — Permits</strong> to see what&apos;s been found</li>
-            <li><strong className="text-[#10B981]">Import CSV or LeadScraper</strong> data to enrich your lead list</li>
-            <li><strong className="text-[#10B981]">Use the Kanban boards</strong> to track your sales pipeline</li>
+            <li><strong className="text-[#3B82F6]">Log in</strong> with credentials from your admin — all features unlock instantly</li>
+            <li><strong className="text-[#3B82F6]">Check your Dashboard</strong> for an overview of scores and recent imports</li>
+            <li><strong className="text-[#3B82F6]">Set up a Territory</strong> — pick a city, run an ingestion scan</li>
+            <li><strong className="text-[#3B82F6]">Browse Leads — Permits</strong> to see what&apos;s been found</li>
+            <li><strong className="text-[#3B82F6]">Import CSV or LeadScraper</strong> data to enrich your lead list</li>
+            <li><strong className="text-[#3B82F6]">Use the Kanban boards</strong> to track your sales pipeline</li>
           </ol>
         </div>
       </section>
@@ -162,7 +162,7 @@ export default function DocsPage() {
             </thead>
             <tbody>
               <tr>
-                <td className="text-[#10B981] font-bold">🟢 Total All Leads</td>
+                <td className="text-[#3B82F6] font-bold">🟢 Total All Leads</td>
                 <td className="text-[#94A3B8]">Grand total (permit leads + imported leads combined)</td>
               </tr>
               <tr>
@@ -193,7 +193,7 @@ export default function DocsPage() {
               <li>📥 <strong className="text-[#F1F5F9]">Total Leads</strong> — sum of all imported leads</li>
               <li>📊 <strong className="text-[#F1F5F9]">Avg per List</strong> — average leads per batch</li>
               <li>📅 Newest / oldest import dates</li>
-              <li>🔗 <strong className="text-[#10B981]">View All</strong> → <strong className="text-[#F1F5F9]">Leads — Imported</strong></li>
+              <li>🔗 <strong className="text-[#3B82F6]">View All</strong> → <strong className="text-[#F1F5F9]">Leads — Imported</strong></li>
             </ul>
           </div>
           <div className="dark-card p-4">
@@ -203,7 +203,7 @@ export default function DocsPage() {
               <li>⭐ <strong className="text-[#F1F5F9]">Avg Score</strong> — average HVAC score</li>
               <li>🏙️ <strong className="text-[#F1F5F9]">Cities</strong> — unique cities covered</li>
               <li>📈 High / Low score range</li>
-              <li>🔗 <strong className="text-[#10B981]">View All</strong> → <strong className="text-[#F1F5F9]">Leads — Permits</strong></li>
+              <li>🔗 <strong className="text-[#3B82F6]">View All</strong> → <strong className="text-[#F1F5F9]">Leads — Permits</strong></li>
             </ul>
           </div>
         </div>
@@ -228,7 +228,7 @@ export default function DocsPage() {
             </thead>
             <tbody>
               <tr>
-                <td className="text-[#10B981] font-bold">🏙️ Territories</td>
+                <td className="text-[#3B82F6] font-bold">🏙️ Territories</td>
                 <td className="text-[#94A3B8]">How many cities or areas you&apos;re scanning</td>
               </tr>
               <tr>
@@ -240,7 +240,7 @@ export default function DocsPage() {
                 <td className="text-[#94A3B8]">Total leads imported from CSV or LeadScraper</td>
               </tr>
               <tr>
-                <td className="text-[#10B981] font-bold">⭐ Avg Score</td>
+                <td className="text-[#3B82F6] font-bold">⭐ Avg Score</td>
                 <td className="text-[#94A3B8]">Average HVAC score across all your leads</td>
               </tr>
             </tbody>
@@ -306,7 +306,7 @@ export default function DocsPage() {
             <li>📄 Business name, address, phone, website</li>
             <li>🏢 Business type and description</li>
             <li>⭐ <strong className="text-[#F1F5F9]">HVAC Score</strong> with color badge</li>
-            <li>🔗 <strong className="text-[#10B981]">Google Search</strong> link — click to research the business</li>
+            <li>🔗 <strong className="text-[#3B82F6]">Google Search</strong> link — click to research the business</li>
           </ul>
         </div>
 
@@ -317,7 +317,7 @@ export default function DocsPage() {
             <div>
               <p className="text-[#F1F5F9] font-semibold mb-1">⭐ Score Badges</p>
               <ul className="space-y-1 text-[#94A3B8]">
-                <li><span className="score-badge score-high">85</span> — <strong className="text-[#10B981]">Hot 🔥</strong> (≥ 70)</li>
+                <li><span className="score-badge score-high">85</span> — <strong className="text-[#3B82F6]">Hot 🔥</strong> (≥ 70)</li>
                 <li><span className="score-badge score-mid">55</span> — <strong className="text-[#F59E0B]">Warm 🟡</strong> (40–69)</li>
                 <li><span className="score-badge score-low">25</span> — <strong className="text-[#EF4444]">Cool ⚪</strong> (&lt; 40)</li>
               </ul>
@@ -348,7 +348,7 @@ export default function DocsPage() {
         <h3 className="text-lg font-semibold text-[#F1F5F9] mb-2">📤 Two Import Methods</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div className="dark-card p-4">
-            <h4 className="font-semibold text-[#10B981] mb-2">📄 Import CSV</h4>
+            <h4 className="font-semibold text-[#3B82F6] mb-2">📄 Import CSV</h4>
             <p className="text-[#94A3B8] text-sm">
               Upload any <code className="text-[#F1F5F9] bg-[#0F1117] px-1 rounded">.csv</code> file.
               Growth Radar parses it and stores every row as a lead. Name your batch so you
@@ -412,7 +412,7 @@ export default function DocsPage() {
           <p className="text-[#94A3B8]">
             Click any lead row to open a detail modal. It shows the business name, address, phone,
             website, enriched contact info (phone &amp; email from LeadScraper), categories, and
-            sources. A <strong className="text-[#10B981]">Google Search</strong> link lets you research
+            sources. A <strong className="text-[#3B82F6]">Google Search</strong> link lets you research
             the company. The <strong className="text-[#EF4444]">🗑️ Delete</strong> button is right there too.
           </p>
         </div>
@@ -471,18 +471,18 @@ export default function DocsPage() {
         <div className="dark-card p-4 mb-3">
           <h3 className="font-semibold text-[#F1F5F9] mb-3">➕ Creating a Territory</h3>
           <ol className="list-decimal list-inside space-y-2 text-[#94A3B8]">
-            <li>Go to <strong className="text-[#F1F5F9]">Territories</strong> and click <strong className="text-[#10B981]">Add Territory</strong></li>
+            <li>Go to <strong className="text-[#F1F5F9]">Territories</strong> and click <strong className="text-[#3B82F6]">Add Territory</strong></li>
             <li>Give it a name (e.g. &ldquo;Toronto Downtown&rdquo;)</li>
             <li>Enter the <strong className="text-[#F1F5F9]">city</strong> and <strong className="text-[#F1F5F9]">province</strong></li>
             <li>Set the <strong className="text-[#F1F5F9]">search radius</strong> (km from city centre)</li>
-            <li>Click <strong className="text-[#10B981]">Save</strong> — it&apos;s ready to scan</li>
+            <li>Click <strong className="text-[#3B82F6]">Save</strong> — it&apos;s ready to scan</li>
           </ol>
         </div>
 
         <div className="dark-card p-4 mb-3">
           <h3 className="font-semibold text-[#F1F5F9] mb-3">🔄 Running Ingestion</h3>
           <p className="text-[#94A3B8]">
-            Click <strong className="text-[#10B981]">Run Ingestion</strong> on any territory to start scanning
+            Click <strong className="text-[#3B82F6]">Run Ingestion</strong> on any territory to start scanning
             permit data immediately. New leads will appear in <strong className="text-[#F1F5F9]">Leads — Permits</strong>
             once the scan completes. You can also toggle a territory <strong className="text-[#F1F5F9]">Active / Inactive</strong>
             to include or exclude it from automatic scans.
@@ -516,7 +516,7 @@ export default function DocsPage() {
         <div className="dark-card p-4 mb-3">
           <h3 className="font-semibold text-[#F1F5F9] mb-3">⚡ Manual Generation</h3>
           <p className="text-[#94A3B8]">
-            Click <strong className="text-[#10B981]">Generate Brief</strong> to create one on demand anytime.
+            Click <strong className="text-[#3B82F6]">Generate Brief</strong> to create one on demand anytime.
             Useful after adding a new territory or importing a big batch of leads.
           </p>
         </div>
@@ -525,7 +525,7 @@ export default function DocsPage() {
           <h3 className="font-semibold text-[#F1F5F9] mb-3">📋 What&apos;s In a Brief</h3>
           <ul className="space-y-2 text-[#94A3B8]">
             <li>📄 Per-territory summary — what&apos;s new and noteworthy</li>
-            <li>🔥 <strong className="text-[#10B981]">Top leads</strong> section — your highest-scoring prospects, clickable to see details</li>
+            <li>🔥 <strong className="text-[#3B82F6]">Top leads</strong> section — your highest-scoring prospects, clickable to see details</li>
             <li>🕐 Timestamp showing when the brief was last generated</li>
             <li>📊 Stats per territory: total leads, average score, and hot lead count</li>
           </ul>
@@ -557,7 +557,7 @@ export default function DocsPage() {
                   <span className="score-badge score-high">≥ 70</span>
                 </td>
                 <td className="text-[#F1F5F9] font-semibold">🔥 Hot</td>
-                <td className="text-[#10B981]"><span className="text-[#10B981]">●</span> Green</td>
+                <td className="text-[#3B82F6]"><span className="text-[#3B82F6]">●</span> Green</td>
                 <td className="text-[#94A3B8]"><strong className="text-[#F1F5F9]">Call today</strong> — high HVAC potential</td>
               </tr>
               <tr>
@@ -593,34 +593,34 @@ export default function DocsPage() {
       {/* ---- GETTING STARTED ---- */}
       <section className="mb-8">
         <h2 className="text-xl font-bold text-[#F1F5F9] mb-3">🎯 Getting Started Checklist</h2>
-        <div className="dark-card-gradient p-5 border-[rgba(16,185,129,0.2)] border">
+        <div className="dark-card-gradient p-5 border-[rgba(59,130,246,0.2)] border">
           <ul className="space-y-3 text-[#94A3B8]">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">1</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">1</span>
               <span><strong className="text-[#F1F5F9]">Log in</strong> with credentials from your admin</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">2</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">2</span>
               <span><strong className="text-[#F1F5F9]">Check the Dashboard</strong> — get oriented, see your stats</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">3</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">3</span>
               <span><strong className="text-[#F1F5F9]">Set up a territory</strong> — pick a city, name it, run ingestion</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">4</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">4</span>
               <span><strong className="text-[#F1F5F9]">Browse permit leads</strong> — search, filter, sort, click to see details</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">5</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">5</span>
               <span><strong className="text-[#F1F5F9]">Import leads</strong> — upload a CSV or pull from LeadScraper</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">6</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">6</span>
               <span><strong className="text-[#F1F5F9]">Use the Kanban boards</strong> — drag leads through your pipeline</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[rgba(16,185,129,0.15)] text-[#10B981] flex items-center justify-center flex-shrink-0 text-sm font-bold">7</span>
+              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] flex items-center justify-center flex-shrink-0 text-sm font-bold">7</span>
               <span><strong className="text-[#F1F5F9]">Read the Daily Brief</strong> every morning — know your top leads instantly</span>
             </li>
           </ul>

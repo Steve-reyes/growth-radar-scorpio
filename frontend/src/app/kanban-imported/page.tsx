@@ -35,7 +35,7 @@ interface LeadWithKey extends ImportLead {
 }
 
 const COLUMNS = [
-  { key: 'new', label: 'New', color: '#10B981', bg: 'rgba(16,185,129,0.08)' },
+  { key: 'new', label: 'New', color: '#3B82F6', bg: 'rgba(59,130,246,0.08)' },
   { key: 'contacted', label: 'Contacted', color: '#3B82F6', bg: 'rgba(59,130,246,0.08)' },
   { key: 'qualified', label: 'Qualified', color: '#F59E0B', bg: 'rgba(245,158,11,0.08)' },
   { key: 'converted', label: 'Converted', color: '#8B5CF6', bg: 'rgba(139,92,246,0.08)' },
@@ -43,7 +43,7 @@ const COLUMNS = [
 ];
 
 const IMPORT_COLORS = [
-  { bg: 'rgba(16,185,129,0.12)', text: '#10B981', dot: '#10B981' },
+  { bg: 'rgba(59,130,246,0.12)', text: '#3B82F6', dot: '#3B82F6' },
   { bg: 'rgba(59,130,246,0.12)', text: '#3B82F6', dot: '#3B82F6' },
   { bg: 'rgba(139,92,246,0.12)', text: '#8B5CF6', dot: '#8B5CF6' },
   { bg: 'rgba(245,158,11,0.12)', text: '#F59E0B', dot: '#F59E0B' },
@@ -65,7 +65,7 @@ function ScoreBadge({ score }: { score: number | null | undefined }) {
       <span className="score-mini-bar-track">
         <span className="score-mini-bar-fill" style={{
           width: `${Math.min(s, 100)}%`,
-          background: s > 70 ? '#10B981' : s > 40 ? '#F59E0B' : '#EF4444',
+          background: s > 70 ? '#3B82F6' : s > 40 ? '#F59E0B' : '#EF4444',
         }} />
       </span>
     </span>
@@ -219,7 +219,7 @@ export default function KanbanImportedPage() {
           onClick={() => setSelectedImportId(null)}
           className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
             selectedImportId === null
-              ? 'bg-[rgba(16,185,129,0.2)] text-[#10B981] ring-1 ring-[#10B981]'
+              ? 'bg-[rgba(59,130,246,0.2)] text-[#3B82F6] ring-1 ring-[#3B82F6]'
               : 'bg-[rgba(148,163,184,0.08)] text-[#64748B] hover:bg-[rgba(148,163,184,0.15)]'
           }`}
         >
@@ -263,7 +263,7 @@ export default function KanbanImportedPage() {
         <div className="dark-card p-12 text-center">
           <p className="text-lg font-semibold text-[#64748B] mb-2">No imported leads</p>
           <p className="text-sm text-[#64748B]">
-            Go to <a href="/leads-imported" className="text-[#10B981] hover:underline">Leads — Imported</a> to import data first.
+            Go to <a href="/leads-imported" className="text-[#3B82F6] hover:underline">Leads — Imported</a> to import data first.
           </p>
         </div>
       ) : (
@@ -356,19 +356,19 @@ export default function KanbanImportedPage() {
               {getLeadPhone(selectedLead) && (
                 <div>
                   <span className="text-[#64748B]">Phone:</span>{' '}
-                  <a href={`tel:${getLeadPhone(selectedLead)}`} className="text-[#10B981] hover:underline">{getLeadPhone(selectedLead)}</a>
+                  <a href={`tel:${getLeadPhone(selectedLead)}`} className="text-[#3B82F6] hover:underline">{getLeadPhone(selectedLead)}</a>
                 </div>
               )}
               {getLeadEmail(selectedLead) && (
                 <div>
                   <span className="text-[#64748B]">Email:</span>{' '}
-                  <a href={`mailto:${getLeadEmail(selectedLead)}`} className="text-[#10B981] hover:underline">{getLeadEmail(selectedLead)}</a>
+                  <a href={`mailto:${getLeadEmail(selectedLead)}`} className="text-[#3B82F6] hover:underline">{getLeadEmail(selectedLead)}</a>
                 </div>
               )}
               {selectedLead.website && (
                 <div>
                   <span className="text-[#64748B]">Website:</span>{' '}
-                  <a href={selectedLead.website} target="_blank" className="text-[#10B981] hover:underline">
+                  <a href={selectedLead.website} target="_blank" className="text-[#3B82F6] hover:underline">
                     {selectedLead.website}
                   </a>
                 </div>
@@ -404,7 +404,7 @@ export default function KanbanImportedPage() {
                       setSelectedLead(prev => prev ? { ...prev, status: s } : null);
                     }}
                     className={`status-badge status-${s} cursor-pointer transition-all ${
-                      selectedLead.status === s ? 'ring-2 ring-[#10B981] ring-offset-2 ring-offset-[#1A1D27]' : 'opacity-60 hover:opacity-100'
+                      selectedLead.status === s ? 'ring-2 ring-[#3B82F6] ring-offset-2 ring-offset-[#1A1D27]' : 'opacity-60 hover:opacity-100'
                     }`}
                   >
                     <span className={`status-dot status-dot-${s}`} />

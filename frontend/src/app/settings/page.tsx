@@ -108,7 +108,7 @@ export default function SettingsPage() {
             </div>
           )}
           {success && (
-            <div className="mb-4 p-3 rounded-lg bg-[rgba(16,185,129,0.1)] border border-[rgba(16,185,129,0.2)] text-sm text-[#10B981]">
+            <div className="mb-4 p-3 rounded-lg bg-[rgba(59,130,246,0.1)] border border-[rgba(59,130,246,0.2)] text-sm text-[#3B82F6]">
               {success}
             </div>
           )}
@@ -121,7 +121,7 @@ export default function SettingsPage() {
               placeholder="Full name"
               required
               className="px-3 py-2.5 rounded-lg bg-[rgba(148,163,184,0.06)] border border-[rgba(148,163,184,0.12)]
-                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#10B981]"
+                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6]"
             />
             <input
               type="email"
@@ -130,7 +130,7 @@ export default function SettingsPage() {
               placeholder="Email address"
               required
               className="px-3 py-2.5 rounded-lg bg-[rgba(148,163,184,0.06)] border border-[rgba(148,163,184,0.12)]
-                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#10B981]"
+                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6]"
             />
             <input
               type="password"
@@ -140,11 +140,11 @@ export default function SettingsPage() {
               required
               minLength={6}
               className="px-3 py-2.5 rounded-lg bg-[rgba(148,163,184,0.06)] border border-[rgba(148,163,184,0.12)]
-                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#10B981]"
+                text-[#F1F5F9] text-sm placeholder:text-[#64748B] focus:outline-none focus:border-[#3B82F6]"
             />
             <button
               type="submit"
-              className="py-2.5 px-4 rounded-lg bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold transition-all"
+              className="py-2.5 px-4 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white text-sm font-semibold transition-all"
             >
               Add User
             </button>
@@ -176,7 +176,7 @@ export default function SettingsPage() {
                         <td>
                           <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                             u.role === 'admin'
-                              ? 'bg-[rgba(16,185,129,0.1)] text-[#10B981]'
+                              ? 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]'
                               : 'bg-[rgba(148,163,184,0.1)] text-[#94A3B8]'
                           }`}>
                             {u.role}
