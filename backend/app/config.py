@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_VERSION: str = "0.2.0"
 
     model_config = {
-        "env_file": str(Path(__file__).resolve().parent.parent.parent.parent / ".env"),
+        "env_file": str(Path(__file__).resolve().parent.parent / ".env"),
         "env_file_encoding": "utf-8",
         "extra": "ignore",
     }
