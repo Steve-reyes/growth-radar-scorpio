@@ -72,6 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('gr_token');
     setUser(null);
     setToken(null);
+    // Hard redirect to clear any cached page state
+    window.location.href = '/login';
   }, []);
 
   return (

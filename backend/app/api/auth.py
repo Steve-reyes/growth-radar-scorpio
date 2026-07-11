@@ -65,9 +65,14 @@ async def get_current_user(
 
 # ── Routes ──
 
-@router.post("/register", response_model=TokenResponse)
+@router.post("/register", response_model=TokenResponse, summary="Register a new account")
 async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    """Register a new user."""
+    """Register a new user account.
+
+    Creates a user with the provided email, name, and password.
+    Returns a JWT access token and the user profile on success.
+    Raises 400 if the email is already registered.
+    """
     existing = await db.execute(select(User).where(User.email == data.email))
     if existing.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -86,9 +91,14 @@ async def register(data: RegisterRequest, db: AsyncSession = Depends(get_db)):
     return TokenResponse(access_token=token, user=user)
 
 
-@router.post("/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse, summary="Login with email + password")
 async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
-    """Login with email and password."""
+    """Authenticate and receive a JWT token.
+
+    Validates email and password credentials. Returns a bearer
+    access token and the authenticated user's profile. The demo
+    admin account is admin@growthradar.dev / admin123.
+    """
     result = await db.execute(select(User).where(User.email == data.email))
     user = result.scalar_one_or_none()
     if not user or not verify_password(data.password, user.hashed_password):
@@ -100,31 +110,45 @@ async def login(data: LoginRequest, db: AsyncSession = Depends(get_db)):
     return TokenResponse(access_token=token, user=user)
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse, summary="Get current authenticated user")
 async def me(current_user: User = Depends(get_current_user)):
-    """Get current user info."""
+    """Get the profile of the currently authenticated user.
+
+    Returns the user's id, email, name, role, and active status.
+    Requires a valid bearer token in the Authorization header.
+    """
     return current_user
 
 
-@router.get("/users", response_model=list[UserResponse])
+@router.get("/users", response_model=list[UserResponse], summary="List all users (admin only)")
 async def list_users(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """List all users (admin only)."""
+    """List all registered users (admin-only).
+
+    Returns every user ordered by creation date descending.
+    Only accessible by users with the 'admin' role.
+    Raises 403 if the requesting user is not an admin.
+    """
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin only")
     result = await db.execute(select(User).order_by(User.created_at.desc()))
     return result.scalars().all()
 
 
-@router.post("/users", response_model=UserResponse)
+@router.post("/users", response_model=UserResponse, summary="Create a new user (admin only)")
 async def create_user(
     data: RegisterRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Create a new user (admin only)."""
+    """Create a new user account (admin-only).
+
+    Creates a user with the provided email, name, and password.
+    Only accessible by users with the 'admin' role. The new user
+    is assigned the 'user' role by default.
+    """
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin only")
     existing = await db.execute(select(User).where(User.email == data.email))

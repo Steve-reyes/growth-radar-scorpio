@@ -27,7 +27,7 @@ const navItems = [
     ),
   },
   {
-    name: 'Leads',
+    name: 'Leads - Permits',
     href: '/leads',
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -36,15 +36,14 @@ const navItems = [
       </svg>
     ),
   },
-
   {
-    name: 'Kanban',
+    name: 'Kanban - Permits',
     href: '/kanban',
     icon: (
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="3" width="4" height="14" rx="1" />
-        <rect x="8" y="3" width="4" height="11" rx="1" />
-        <rect x="14" y="3" width="4" height="8" rx="1" />
+        <rect x="3" y="2" width="14" height="16" rx="2" />
+        <path d="M7 6h6M7 9h6M7 12h6" />
+        <path d="M12 15l-2-2-1 1" />
       </svg>
     ),
   },
@@ -55,6 +54,31 @@ const navItems = [
       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M5 2h10a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V3a1 1 0 011-1z" />
         <path d="M7 6h6M7 9h6M7 12h4" />
+      </svg>
+    ),
+  },
+
+  {
+    name: 'Leads - Imported',
+    href: '/leads-imported',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 1v8M6 6l4 4 4-4" />
+        <path d="M1 17h18" />
+        <rect x="2" y="11" width="16" height="6" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    name: 'Kanban - Imported',
+    href: '/kanban-imported',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="2" y="3" width="4" height="14" rx="1" />
+        <rect x="8" y="3" width="4" height="11" rx="1" />
+        <rect x="14" y="3" width="4" height="8" rx="1" />
+        <path d="M10 1v3M6 5l4 4 4-4" />
+        <path d="M1 17h18" />
       </svg>
     ),
   },
@@ -79,7 +103,7 @@ export default function Navigation() {
 
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
-    return pathname.startsWith(href);
+    return pathname === href || pathname.startsWith(href + '/');
   };
 
   return (

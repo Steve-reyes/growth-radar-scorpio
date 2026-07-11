@@ -44,6 +44,7 @@ export interface DailyBrief {
   territory_id: number | null;
   title: string;
   summary: string;
+  recommendations?: string | null;
   lead_count: number;
   generated_at: string;
   delivered: boolean;

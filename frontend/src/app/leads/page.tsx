@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Lead } from '@/lib/types';
 import { apiGet, apiPatch } from '@/lib/api';
+import { exportLeadsCSV } from '@/lib/csv';
 
 function ScoreBadge({ score }: { score: number }) {
   let cls = 'score-low';
@@ -95,7 +96,7 @@ export default function LeadsPage() {
     if (statusFilter) params.set('status', statusFilter);
     if (minScore > 0) params.set('min_score', String(minScore));
     if (search) params.set('search', search);
-    params.set('limit', '200');
+    params.set('limit', '2000');
 
     setLoading(true);
     apiGet<Lead[]>(`/api/leads?${params.toString()}`)
@@ -179,11 +180,21 @@ export default function LeadsPage() {
           <div className="page-breadcrumb mb-1">
             Leads <span className="page-breadcrumb-sep">/</span> <span className="text-[#94A3B8]">All Leads</span>
           </div>
-          <h1 className="text-2xl font-bold text-[#F1F5F9]">Leads</h1>
+          <h1 className="text-2xl font-bold text-[#F1F5F9]">Leads — Permits</h1>
           <p className="text-sm text-[#64748B] mt-1">
             {filtered.length} leads in {cityNames.length} cities
           </p>
         </div>
+        <button
+          onClick={() => exportLeadsCSV(filtered, `leads-${new Date().toISOString().slice(0,10)}.csv`)}
+          className="dark-pill dark-pill-secondary h-[42px] text-sm flex items-center gap-1.5 hover-lift"
+          title="Export filtered leads as CSV"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M7 1.5v8M4 7l3 3 3-3M1.5 10v2a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-2"/>
+          </svg>
+          Export CSV
+        </button>
       </div>
 
       {/* Search & Filters */}
@@ -287,11 +298,11 @@ export default function LeadsPage() {
                 style={{ borderColor: isExpanded ? colors.border : 'rgba(148,163,184,0.06)' }}
               >
                 {/* City Header */}
-                <button
-                  onClick={() => toggleCity(city)}
-                  className="w-full flex items-center justify-between p-4 hover:bg-[rgba(148,163,184,0.02)] transition-colors text-left"
-                >
-                  <div className="flex items-center gap-3">
+                <div className="w-full flex items-center justify-between p-4 transition-colors">
+                  <button
+                    onClick={() => toggleCity(city)}
+                    className="flex items-center gap-3 hover:opacity-80 transition-opacity text-left"
+                  >
                     <span
                       className="w-3 h-3 rounded-full flex-shrink-0"
                       style={{ background: colors.dot, boxShadow: `0 0 6px ${colors.dot}60` }}
@@ -308,14 +319,24 @@ export default function LeadsPage() {
                         avg {avgScore}
                       </span>
                     )}
-                  </div>
-                  <svg
-                    width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-                    className={`text-[#64748B] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    <svg
+                      width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                      className={`text-[#64748B] transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    >
+                      <path d="M4 6l4 4 4-4" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); exportLeadsCSV(cityLeads, `${city.toLowerCase()}-leads.csv`); }}
+                    className="text-xs font-semibold text-[#10B981] hover:text-[#34D399] flex items-center gap-1 px-2 py-1 rounded hover:bg-[rgba(16,185,129,0.1)] transition-all"
+                    title={`Export ${city} leads as CSV`}
                   >
-                    <path d="M4 6l4 4 4-4" />
-                  </svg>
-                </button>
+                    <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 1.5v8M4 7l3 3 3-3M1.5 10v2a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-2"/>
+                    </svg>
+                    CSV
+                  </button>
+                </div>
 
                 {/* City Leads Table */}
                 {isExpanded && (

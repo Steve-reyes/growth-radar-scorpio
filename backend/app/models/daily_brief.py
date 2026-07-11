@@ -10,6 +10,7 @@ class DailyBrief(Base):
     territory_id = Column(Integer, ForeignKey("territories.id"), nullable=True)
     title = Column(String(255), nullable=False)
     summary = Column(Text, nullable=False)
+    recommendations = Column(Text, nullable=True)
     lead_count = Column(Integer, default=0, nullable=False)
     generated_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     delivered = Column(Boolean, default=False, nullable=False)

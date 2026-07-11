@@ -122,9 +122,9 @@ export default function KanbanPage() {
     <div>
       <div className="mb-6">
         <div className="page-breadcrumb mb-1">
-          Leads <span className="page-breadcrumb-sep">/</span> <span className="text-[#94A3B8]">Kanban Board</span>
+          Kanban <span className="page-breadcrumb-sep">/</span> <span className="text-[#94A3B8]">Permits Board</span>
         </div>
-        <h1 className="text-2xl font-bold text-[#F1F5F9]">Kanban Board</h1>
+        <h1 className="text-2xl font-bold text-[#F1F5F9]">Kanban — Permits</h1>
         <p className="text-sm text-[#64748B] mt-1">
           Drag & drop leads between columns &middot; {filteredLeads.length} leads
           {activeTerritoryId && territories.find(t => t.id === activeTerritoryId) && (

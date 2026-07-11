@@ -4,6 +4,17 @@ import { useState, useEffect, useCallback } from 'react';
 import { DashboardStats, Lead, DailyBrief } from '@/lib/types';
 import { apiGet } from '@/lib/api';
 
+interface ImportBatchSummary {
+  id: string;
+  list_name: string;
+  imported_at: string;
+  count: number;
+}
+
+interface ImportListResponse {
+  imports: ImportBatchSummary[];
+}
+
 function SkeletonCard() {
   return (
     <div className="dark-card p-5">
@@ -19,9 +30,6 @@ function SkeletonRow() {
       <td className="p-3"><div className="skeleton h-5 w-40" /></td>
       <td className="p-3"><div className="skeleton h-5 w-24" /></td>
       <td className="p-3"><div className="skeleton h-5 w-20" /></td>
-      <td className="p-3"><div className="skeleton h-5 w-12" /></td>
-      <td className="p-3"><div className="skeleton h-5 w-20" /></td>
-      <td className="p-3"><div className="skeleton h-5 w-28" /></td>
     </tr>
   );
 }
@@ -59,6 +67,7 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [brief, setBrief] = useState<DailyBrief | null>(null);
+  const [importBatches, setImportBatches] = useState<ImportBatchSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
@@ -96,12 +105,14 @@ export default function Dashboard() {
   useEffect(() => {
     async function load() {
       try {
-        const [statsData, leadsData] = await Promise.all([
+        const [statsData, leadsData, importData] = await Promise.all([
           apiGet<DashboardStats>('/api/settings/stats').catch(() => null),
-          apiGet<Lead[]>('/api/leads?limit=200').catch(() => [])
+          apiGet<Lead[]>('/api/leads?limit=200').catch(() => []),
+          apiGet<ImportListResponse>('/api/import/list').catch(() => ({ imports: [] })),
         ]);
         if (statsData) setStats(statsData);
         if (leadsData) setLeads(leadsData);
+        if (importData?.imports) setImportBatches(importData.imports);
 
         const briefData = await apiGet<DailyBrief>('/api/briefs/latest').catch(() => null);
         if (briefData) {
@@ -135,12 +146,10 @@ export default function Dashboard() {
     try {
       const lead = await apiGet<Lead>(`/api/leads/${leadId}`);
       setSelectedLead(lead);
-    } catch {
-      // silently fail — user can retry by clicking again
-    }
+    } catch {}
   };
 
-  // Compute score distribution from leads
+  // Compute score distribution from permit leads
   const scoreRanges = [
     { label: '0-20', min: 0, max: 20 },
     { label: '21-40', min: 21, max: 40 },
@@ -151,6 +160,8 @@ export default function Dashboard() {
   const maxCount = leads.length > 0
     ? Math.max(...scoreRanges.map(r => leads.filter(l => l.hvac_score >= r.min && l.hvac_score <= r.max).length))
     : 1;
+
+  const totalImported = importBatches.reduce((sum, b) => sum + b.count, 0);
 
   if (error) {
     return (
@@ -175,145 +186,163 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {loading ? (
-          <>
-            <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
-          </>
-        ) : (
-          <>
-            <div className="dark-card-gradient p-5">
-              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Total Territories</p>
-              <div className="flex items-end gap-3">
-                <p className="text-3xl font-extrabold text-[#F1F5F9] font-mono">{stats?.total_territories ?? 0}</p>
-                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 7L5 3L9 7" />
-                  </svg>
-                  +12%
-                </span>
-              </div>
-            </div>
-            <div className="dark-card p-5">
-              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Total Leads</p>
-              <div className="flex items-end gap-3">
-                <p className="text-3xl font-extrabold text-[#F1F5F9] font-mono">{stats?.total_leads ?? 0}</p>
-                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 7L5 3L9 7" />
-                  </svg>
-                  +8%
-                </span>
-              </div>
-            </div>
-            <div className="dark-card p-5">
-              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Leads Today</p>
-              <div className="flex items-end gap-3">
-                <p className="text-3xl font-extrabold text-[#F1F5F9] font-mono">{stats?.leads_today ?? 0}</p>
-                <span className="trend-down text-xs font-semibold flex items-center gap-0.5 mb-1">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 3L5 7L9 3" />
-                  </svg>
-                  -3%
-                </span>
-              </div>
-            </div>
-            <div className="dark-card p-5">
-              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Avg HVAC Score</p>
-              <div className="flex items-end gap-3">
-                <p className="text-3xl font-extrabold text-[#10B981] font-mono">{stats ? (stats.average_hvac_score ?? 0).toFixed(1) : '0'}</p>
-                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
-                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 7L5 3L9 7" />
-                  </svg>
-                  +5%
-                </span>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Leads Table */}
-        <div className="lg:col-span-2 dark-card overflow-hidden">
-          <div className="px-5 py-4 border-b border-[rgba(148,163,184,0.06)]">
-            <h2 className="text-base font-bold text-[#F1F5F9]">Recent Leads</h2>
+        {/* Leads Analytics Panel */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Combined Totals */}
+          <div className="dark-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-[#F1F5F9]">Leads Analytics</h2>
+              <div className="flex items-center gap-3">
+                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline font-semibold">Imported →</a>
+                <a href="/leads" className="text-xs text-[#10B981] hover:underline font-semibold">Permits →</a>
+              </div>
+            </div>
+            {loading ? (
+              <div className="grid grid-cols-4 gap-4">
+                <div className="skeleton h-16 w-full"/>
+                <div className="skeleton h-16 w-full"/>
+                <div className="skeleton h-16 w-full"/>
+                <div className="skeleton h-16 w-full"/>
+              </div>
+            ) : (
+              <div className="grid grid-cols-4 gap-4 mb-4">
+                <div className="bg-[rgba(16,185,129,0.08)] border border-[rgba(16,185,129,0.15)] rounded-xl p-4 text-center">
+                  <p className="text-2xl font-extrabold text-[#10B981] font-mono">{stats ? (stats.total_leads ?? 0) + totalImported : totalImported}</p>
+                  <p className="text-xs text-[#64748B] mt-1">Total All Leads</p>
+                </div>
+                <div className="bg-[rgba(59,130,246,0.08)] border border-[rgba(59,130,246,0.15)] rounded-xl p-4 text-center">
+                  <p className="text-2xl font-extrabold text-[#3B82F6] font-mono">{stats?.total_leads ?? 0}</p>
+                  <p className="text-xs text-[#64748B] mt-1">Permit Leads</p>
+                </div>
+                <div className="bg-[rgba(139,92,246,0.08)] border border-[rgba(139,92,246,0.15)] rounded-xl p-4 text-center">
+                  <p className="text-2xl font-extrabold text-[#8B5CF6] font-mono">{totalImported}</p>
+                  <p className="text-xs text-[#64748B] mt-1">Imported Leads</p>
+                </div>
+                <div className="bg-[rgba(245,158,11,0.08)] border border-[rgba(245,158,11,0.15)] rounded-xl p-4 text-center">
+                  <p className="text-2xl font-extrabold text-[#F59E0B] font-mono">{stats ? (stats.average_hvac_score ?? 0).toFixed(1) : '0'}</p>
+                  <p className="text-xs text-[#64748B] mt-1">Avg HVAC Score</p>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="overflow-x-auto">
-            <table className="dark-table">
-              <thead>
-                <tr>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_name')}>
-                    Business<span className="ml-1">{sortArrow('business_name')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('phone')}>
-                    Phone<span className="ml-1">{sortArrow('phone')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('email')}>
-                    Email<span className="ml-1">{sortArrow('email')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-right cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('licence_fee')}>
-                    Fee<span className="ml-1">{sortArrow('licence_fee')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-right cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('num_employees')}>
-                    Emp<span className="ml-1">{sortArrow('num_employees')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('city')}>
-                    City<span className="ml-1">{sortArrow('city')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('business_type')}>
-                    Type<span className="ml-1">{sortArrow('business_type')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('hvac_score')}>
-                    Score<span className="ml-1">{sortArrow('hvac_score')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('status')}>
-                    Status<span className="ml-1">{sortArrow('status')}</span>
-                  </th>
-                  <th className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] px-4 py-3 text-left cursor-pointer hover:text-[#10B981] select-none" onClick={() => handleSort('discovered_at')}>
-                    Discovered<span className="ml-1">{sortArrow('discovered_at')}</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {loading ? (
-                  <>
-                    <SkeletonRow /><SkeletonRow /><SkeletonRow /><SkeletonRow /><SkeletonRow />
-                  </>
-                ) : leads.length === 0 ? (
-                  <tr>
-                    <td colSpan={10} className="text-center py-8 text-[#64748B]">No leads yet</td>
-                  </tr>
-                ) : (
-                  sortedLeads.map((lead) => (
-                    <tr key={lead.id} className="transition-colors">
-                      <td className="font-semibold text-[#F1F5F9] cursor-pointer hover:text-[#10B981] transition-colors" onClick={() => handleLeadClick(lead.id)}>{lead.business_name}</td>
-                      <td className="text-sm text-[#94A3B8]">
-                        {lead.phone ? <a href={`tel:${lead.phone}`} className="hover:text-[#10B981]">{lead.phone}</a> : '-'}
-                      </td>
-                      <td className="text-sm text-[#94A3B8]">
-                        {lead.email ? <a href={`mailto:${lead.email}`} className="hover:text-[#10B981]">{lead.email}</a> : '-'}
-                      </td>
-                      <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.licence_fee ? `$${lead.licence_fee.toLocaleString()}` : '-'}</td>
-                      <td className="text-sm text-[#94A3B8] text-right font-mono">{lead.num_employees ?? '-'}</td>
-                      <td className="text-[#94A3B8]">{lead.city || '-'}</td>
-                      <td className="text-[#94A3B8] max-w-[200px] truncate">{lead.business_type || '-'}</td>
-                      <td><ScoreBadge score={lead.hvac_score} /></td>
-                      <td><StatusBadge status={lead.status} /></td>
-                      <td className="text-sm text-[#64748B]">
-                        {lead.discovered_at ? new Date(lead.discovered_at).toLocaleDateString() : '-'}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+
+          {/* Imported + Permit Details */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Imported Leads Detail */}
+            <div className="dark-card p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-[#F1F5F9]">Imported</h3>
+                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline">View All →</a>
+              </div>
+              {loading ? (
+                <div className="space-y-3">
+                  <div className="skeleton h-10 w-full"/>
+                  <div className="skeleton h-10 w-full"/>
+                  <div className="skeleton h-10 w-full"/>
+                </div>
+              ) : importBatches.length === 0 ? (
+                <p className="text-sm text-[#64748B] text-center py-6">No imported leads yet</p>
+              ) : (
+                <>
+                  <div className="space-y-3 mb-3">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(139,92,246,0.06)] border border-[rgba(139,92,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Import Lists</span>
+                      <span className="text-lg font-extrabold text-[#8B5CF6] font-mono">{importBatches.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(139,92,246,0.06)] border border-[rgba(139,92,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Total Leads</span>
+                      <span className="text-lg font-extrabold text-[#8B5CF6] font-mono">{totalImported}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(139,92,246,0.06)] border border-[rgba(139,92,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Avg per List</span>
+                      <span className="text-lg font-extrabold text-[#8B5CF6] font-mono">{Math.round(totalImported / importBatches.length)}</span>
+                    </div>
+                  </div>
+                  <div className="text-xs text-[#64748B] flex justify-between">
+                    <span>Newest: {new Date(importBatches[0].imported_at).toLocaleDateString()}</span>
+                    <span>Oldest: {new Date(importBatches[importBatches.length - 1].imported_at).toLocaleDateString()}</span>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Permit Leads Detail */}
+            <div className="dark-card p-5">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-bold text-[#F1F5F9]">Permits</h3>
+                <a href="/leads" className="text-xs text-[#10B981] hover:underline">View All →</a>
+              </div>
+              {loading ? (
+                <div className="space-y-3">
+                  <div className="skeleton h-10 w-full"/>
+                  <div className="skeleton h-10 w-full"/>
+                  <div className="skeleton h-10 w-full"/>
+                </div>
+              ) : leads.length === 0 ? (
+                <p className="text-sm text-[#64748B] text-center py-6">No permit leads yet</p>
+              ) : (
+                <>
+                  <div className="space-y-3 mb-3">
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Total Leads</span>
+                      <span className="text-lg font-extrabold text-[#3B82F6] font-mono">{leads.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Avg Score</span>
+                      <span className="text-lg font-extrabold text-[#3B82F6] font-mono">{(leads.reduce((s, l) => s + l.hvac_score, 0) / leads.length).toFixed(1)}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.1)]">
+                      <span className="text-xs text-[#64748B]">Cities</span>
+                      <span className="text-lg font-extrabold text-[#3B82F6] font-mono">{new Set(leads.filter(l => l.city).map(l => l.city)).size}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-[#64748B]">
+                    <span>High score: {Math.max(...leads.map(l => l.hvac_score))}</span>
+                    <span>Low: {Math.min(...leads.map(l => l.hvac_score))}</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* Top Import Lists Quick Reference */}
+          {!loading && importBatches.length > 0 && (
+            <div className="dark-card p-5">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-bold text-[#F1F5F9]">Largest Import Lists</h3>
+                <a href="/leads-imported" className="text-xs text-[#10B981] hover:underline">View All →</a>
+              </div>
+              <div className="space-y-2">
+                {[...importBatches]
+                  .sort((a, b) => b.count - a.count)
+                  .slice(0, 5)
+                  .map((batch, i) => (
+                    <div key={batch.id} className="flex items-center gap-3">
+                      <span className="text-xs font-mono text-[#64748B] w-5 text-right">{i + 1}.</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-[#F1F5F9] truncate">{batch.list_name}</span>
+                          <span className="text-sm font-mono text-[#8B5CF6] font-semibold ml-3">{batch.count}</span>
+                        </div>
+                        <div className="mt-1 h-1.5 bg-[rgba(148,163,184,0.06)] rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full"
+                            style={{
+                              width: `${(batch.count / Math.max(...importBatches.map(b => b.count))) * 100}%`,
+                              background: 'linear-gradient(90deg, #8B5CF6, #A78BFA)'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Score Distribution */}
+        {/* Score Distribution + Latest Brief */}
         <div className="space-y-6">
           <div className="dark-card p-5">
             <h2 className="text-base font-bold mb-4 text-[#F1F5F9]">Score Distribution</h2>
@@ -392,7 +421,6 @@ export default function Dashboard() {
                     .split('\n').filter(l => l.trim()).slice(0, 8).join('\n')}
                 </div>
 
-                {/* Clickable Lead Pills with names */}
                 {brief.top_lead_ids && brief.top_lead_ids.length > 0 && (
                   <div className="mt-3 space-y-1.5">
                     {brief.top_lead_ids.map((id, i) => {
@@ -439,6 +467,61 @@ export default function Dashboard() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {loading ? (
+          <>
+            <SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard />
+          </>
+        ) : (
+          <>
+            <div className="dark-card-gradient p-5">
+              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Total Territories</p>
+              <div className="flex items-end gap-3">
+                <p className="text-3xl font-extrabold text-[#F1F5F9] font-mono">{stats?.total_territories ?? 0}</p>
+                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 7L5 3L9 7" />
+                  </svg>
+                  +12%
+                </span>
+              </div>
+            </div>
+            <div className="dark-card p-5">
+              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Total Leads (Permits)</p>
+              <div className="flex items-end gap-3">
+                <p className="text-3xl font-extrabold text-[#F1F5F9] font-mono">{stats?.total_leads ?? 0}</p>
+                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 7L5 3L9 7" />
+                  </svg>
+                  +8%
+                </span>
+              </div>
+            </div>
+            <div className="dark-card p-5">
+              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Imported Leads</p>
+              <div className="flex items-end gap-3">
+                <p className="text-3xl font-extrabold text-[#8B5CF6] font-mono">{totalImported}</p>
+                <span className="text-xs text-[#64748B] font-mono">{importBatches.length} lists</span>
+              </div>
+            </div>
+            <div className="dark-card p-5">
+              <p className="text-xs font-bold text-[#64748B] uppercase tracking-[0.08em] mb-2">Avg HVAC Score</p>
+              <div className="flex items-end gap-3">
+                <p className="text-3xl font-extrabold text-[#10B981] font-mono">{stats ? (stats.average_hvac_score ?? 0).toFixed(1) : '0'}</p>
+                <span className="trend-up text-xs font-semibold flex items-center gap-0.5 mb-1">
+                  <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 7L5 3L9 7" />
+                  </svg>
+                  +5%
+                </span>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Lead Detail Modal */}

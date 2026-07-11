@@ -53,7 +53,7 @@ class LeadResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
-@router.get("", response_model=list[LeadResponse])
+@router.get("", response_model=list[LeadResponse], summary="List leads with filters")
 async def list_leads(
     current_user: User = Depends(get_current_user),
     territory_id: Optional[int] = Query(None),
@@ -64,7 +64,12 @@ async def list_leads(
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ):
-    """List leads with filters."""
+    """List HVAC leads with optional filters.
+
+    Supports filtering by territory, status, minimum HVAC score,
+    and business type. Results are ordered by score descending then
+    discovery date descending. Paginate with limit and offset.
+    """
     stmt = select(Lead)
 
     if territory_id is not None:
@@ -84,13 +89,18 @@ async def list_leads(
     return leads
 
 
-@router.get("/{lead_id}", response_model=LeadResponse)
+@router.get("/{lead_id}", response_model=LeadResponse, summary="Get lead details")
 async def get_lead(
     lead_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Get lead detail."""
+    """Get full details for a single lead.
+
+    Returns all available fields including business info, HVAC score,
+    score reasoning, and any AI-drafted email content.
+    Raises 404 if the lead does not exist.
+    """
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     lead = result.scalar_one_or_none()
     if not lead:
@@ -98,14 +108,19 @@ async def get_lead(
     return lead
 
 
-@router.patch("/{lead_id}", response_model=LeadResponse)
+@router.patch("/{lead_id}", response_model=LeadResponse, summary="Update lead status or notes")
 async def update_lead(
     lead_id: int,
     data: LeadUpdate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Update lead status and/or notes."""
+    """Update a lead's status, notes, phone, or website.
+
+    Supports partial update — only supplied fields are changed.
+    Useful for moving a lead through the pipeline or recording
+    call notes. Raises 404 if the lead is not found.
+    """
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     lead = result.scalar_one_or_none()
     if not lead:
@@ -120,13 +135,18 @@ async def update_lead(
     return lead
 
 
-@router.post("/{lead_id}/draft")
+@router.post("/{lead_id}/draft", summary="Generate outreach email draft")
 async def draft_email(
     lead_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Trigger LLM or template-based outreach email draft for this lead."""
+    """Generate an AI-powered outreach email draft for a lead.
+
+    Uses the configured LLM (OpenAI) to create a personalised
+    cold outreach email based on the lead's business info, territory,
+    and HVAC score. The generated draft is saved to the lead record.
+    """
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     lead = result.scalar_one_or_none()
     if not lead:
@@ -150,13 +170,18 @@ async def draft_email(
     return {"lead_id": lead_id, "email": email_text}
 
 
-@router.delete("/{lead_id}")
+@router.delete("/{lead_id}", summary="Dismiss a lead")
 async def delete_lead(
     lead_id: int,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Soft-delete a lead (set status='dismissed')."""
+    """Soft-delete a lead by marking it as dismissed.
+
+    Sets the lead's status to 'dismissed' rather than deleting it
+    from the database, preserving data for future reference or
+    re-activation. Raises 404 if the lead is not found.
+    """
     result = await db.execute(select(Lead).where(Lead.id == lead_id))
     lead = result.scalar_one_or_none()
     if not lead:

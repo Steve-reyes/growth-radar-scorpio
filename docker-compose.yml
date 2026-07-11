@@ -1,15 +1,16 @@
 services:
   api:
     build: ./backend
-    container_name: growth-radar-api
+    container_name: growth-radar-bc-api
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8000"
     volumes:
-      - growth_radar_data:/app/data
-      - /root/growth-radar/.env:/app/.env:ro
+      - growth_radar_bc_data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
+      - APP_NAME=Growth Radar BC
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,https://bc.growthradar.87.106.124.206.nip.io
 
 volumes:
-  growth_radar_data:
+  growth_radar_bc_data:

@@ -13,8 +13,8 @@ import urllib.request
 import urllib.error
 import ssl
 
-BASE_URL = os.environ.get("SEED_BASE_URL", "https://growth-radar.212.227.153.56.sslip.io")
-ADMIN_EMAIL = os.environ.get("SEED_ADMIN_EMAIL", "steve@hvacpros.com")
+BASE_URL = os.environ.get("SEED_BASE_URL", "https://growthradar.87.106.124.206.nip.io")
+ADMIN_EMAIL = os.environ.get("SEED_ADMIN_EMAIL", "admin@growthradar.dev")
 ADMIN_PASSWORD = os.environ.get("SEED_ADMIN_PASSWORD", "admin123")
 
 TERRITORIES = [
@@ -24,6 +24,20 @@ TERRITORIES = [
      "postal_code": None, "radius_km": 15},
     {"name": "Burnaby", "city": "Burnaby", "province": "BC",
      "postal_code": None, "radius_km": 50},
+    {"name": "Toronto Metro", "city": "Toronto", "province": "ON",
+     "postal_code": None, "radius_km": 15},
+    {"name": "Calgary Metro", "city": "Calgary", "province": "AB",
+     "postal_code": None, "radius_km": 15},
+    {"name": "Edmonton Metro", "city": "Edmonton", "province": "AB",
+     "postal_code": None, "radius_km": 15},
+    {"name": "Surrey Metro", "city": "Surrey", "province": "BC",
+     "postal_code": None, "radius_km": 10},
+    {"name": "Mississauga Metro", "city": "Mississauga", "province": "ON",
+     "postal_code": None, "radius_km": 15},
+    {"name": "Ottawa Metro", "city": "Ottawa", "province": "ON",
+     "postal_code": None, "radius_km": 15},
+    {"name": "Montreal Metro", "city": "Montreal", "province": "QC",
+     "postal_code": None, "radius_km": 15},
 ]
 
 ctx = ssl.create_default_context(cafile="/etc/ssl/certs/ca-certificates.crt")

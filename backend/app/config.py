@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/growth_radar.db"
     OPENAI_API_KEY: str = ""
     ISED_API_BASE: str = "https://api.ised-isde.canada.ca"
-    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://scorpio.87.106.124.206.nip.io,https://growthradar.87.106.124.206.nip.io"
     JWT_SECRET: str = "growth-radar-secret-change-in-production-2026"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRY_HOURS: int = 72
