@@ -92,8 +92,8 @@ async def generate_brief_summary(
     top_ids = [l.id for l in top_10]
 
     lines = [
-        "Daily HVAC Lead Summary",
-        f"Total Leads: {total}  ·  Avg Score Across All: {avg_score:.0f}/100  ·  Hot Leads (Score ≥70): {len(high_potential)}",
+        "Daily Brief — Lead Summary",
+        f"Stats: {total} total leads · avg score {avg_score:.0f} · {len(high_potential)} hot (score ≥70)",
         "",
     ]
 
@@ -103,12 +103,13 @@ async def generate_brief_summary(
         for l in leads:
             by_terr[l.territory_id].append(l)
         lines.append("Breakdown by Territory:")
-        for tid in sorted(by_terr.keys()):
+        sorted_terrs = sorted(by_terr.keys(), key=lambda tid: len(by_terr[tid]), reverse=True)
+        for tid in sorted_terrs:
             tl = by_terr[tid]
             tname = territory_map.get(tid, f"Territory {tid}")
             tavg = sum(l.hvac_score for l in tl) / len(tl)
             thot = len([l for l in tl if l.hvac_score >= 70])
-            lines.append(f"  {tname:25s}  {len(tl):4d} leads  ·  avg {tavg:.0f}  ·  {thot} hot")
+            lines.append(f"  • {tname}: {len(tl)} leads · avg {tavg:.0f} · {thot} hot")
         lines.append("")
 
     # Top leads across all territories
@@ -116,7 +117,7 @@ async def generate_brief_summary(
     for i, l in enumerate(top_10, 1):
         city = l.city or ""
         btype = l.business_type or "N/A"
-        lines.append(f"  {i}. {l.business_name}  —  Score: {l.hvac_score}  —  {city}  —  {btype}")
+        lines.append(f"  {i}. {l.business_name} — Score: {l.hvac_score} — {city} — {btype}")
 
     # Additional hot leads not in top 10
     remaining_hot = [l for l in high_potential if l not in scored[:10]]
@@ -124,7 +125,7 @@ async def generate_brief_summary(
         lines.append("")
         lines.append(f"Other Hot Leads ({len(remaining_hot)} more):")
         for l in remaining_hot[:5]:
-            lines.append(f"  • {l.business_name}  —  Score: {l.hvac_score}  —  {l.city or ''}")
+            lines.append(f"  • {l.business_name} — Score: {l.hvac_score} — {l.city or ''}")
 
     summary = "\n".join(lines)
     return summary, top_ids

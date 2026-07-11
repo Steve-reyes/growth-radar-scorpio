@@ -8,13 +8,15 @@ function cleanSummary(text: string): string {
   return text
     .replace(/^#+\s*/gm, '')
     .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/^- /gm, '  • ')
-    .replace(/—/g, '—')
+    .replace(/—/g, '-')
     .trim();
 }
 
 function parseStatLine(line: string): { total?: string; avg?: string; hot?: string } | null {
-  const m = line.match(/(?:Total )?Leads:\s*(\d+)\s*.*?(?:Avg Score(?: Across All)?):\s*(\d+)\/100\s*.*?Hot Leads[^:]*:\s*(\d+)/);
+  let m = line.match(/(\d+)\s*total leads.*?avg score\s*(\d+).*?(\d+)\s*hot/i);
+  if (m) return { total: m[1], avg: m[2], hot: m[3] };
+  // Fallback for old format
+  m = line.match(/Total Leads:\s*(\d+).*?Avg Score.*?\s(\d+).*?Hot Leads[^:]*(\d+)/);
   if (m) return { total: m[1], avg: m[2], hot: m[3] };
   return null;
 }
@@ -91,25 +93,27 @@ export default function BriefsPage() {
 
   const renderSummarySections = (brief: DailyBrief) => {
     const lines = cleanSummary(brief.summary).split('\n').filter(l => l.trim());
-    const sections: { type: 'header' | 'stats' | 'lead' | 'bullet' | 'other'; text: string; leadId?: number }[] = [];
+    const sections: { type: 'header' | 'stats' | 'lead' | 'bullet' | 'other' | 'leadLine' | 'recSection'; text: string; leadId?: number }[] = [];
 
     for (const line of lines) {
       const trimmed = line.trim();
-      if (trimmed.startsWith('Territory:')) {
-        sections.push({ type: 'header', text: trimmed.replace('Territory:', '').trim() });
-      } else if (trimmed.startsWith('Top Leads')) {
+      if (trimmed.startsWith('Daily Brief')) continue; // skip title
+      if (trimmed.startsWith('Stats:')) {
+        sections.push({ type: 'stats', text: trimmed.replace('Stats:', '').trim() });
+      } else if (trimmed.startsWith('Breakdown by Territory')) {
+        sections.push({ type: 'header', text: 'Leads by Territory' });
+      } else if (trimmed.startsWith('Top 10 Leads')) {
         sections.push({ type: 'header', text: 'Top Leads to Prioritize' });
       } else if (trimmed.startsWith('Other Hot Leads')) {
         sections.push({ type: 'header', text: 'Other Hot Leads' });
       } else if (/^\d+\.\s/.test(trimmed)) {
-        // Numbered lead — find index position in top_lead_ids
-        const idx = sections.filter(s => s.type === 'lead').length;
+        const idx = sections.filter(s => s.type === 'lead' || s.type === 'leadLine').length;
         const leadId = brief.top_lead_ids?.[idx];
         sections.push({ type: 'lead', text: trimmed.replace(/^\d+\.\s*/, ''), leadId });
       } else if (trimmed.startsWith('•')) {
         sections.push({ type: 'bullet', text: trimmed.replace(/^•\s*/, '') });
-      } else if (/^Leads:/.test(trimmed)) {
-        sections.push({ type: 'stats', text: trimmed });
+      } else if (trimmed.startsWith('-')) {
+        sections.push({ type: 'bullet', text: trimmed.replace(/^-\s*/, '') });
       } else if (trimmed) {
         sections.push({ type: 'other', text: trimmed });
       }
@@ -219,13 +223,6 @@ export default function BriefsPage() {
                 {isExpanded && (
                   <div className="brief-content">
                     <div className="px-5 pb-5 pt-0 border-t border-[rgba(148,163,184,0.06)]">
-                      {/* Territory Header */}
-                      {sections.filter(s => s.type === 'header' && s.text !== 'Top Leads to Prioritize' && s.text !== 'Other Hot Leads').map((s, i) => (
-                        <div key={i} className="mt-4">
-                          <h4 className="text-base font-bold text-[#F1F5F9]">{s.text}</h4>
-                        </div>
-                      ))}
-
                       {/* Stats Bar */}
                       {statLine && (
                         <div className="mt-3 flex gap-4">
@@ -242,62 +239,89 @@ export default function BriefsPage() {
                         </div>
                       )}
 
-                      {/* Top Leads Section */}
-                      {(sections.filter(s => s.type === 'header' && s.text === 'Top Leads to Prioritize').length > 0 || (brief.top_lead_ids && brief.top_lead_ids.length > 0)) && (
-                        <div className="mt-5">
-                          <h5 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">Top Leads to Prioritize</h5>
-                          <div className="space-y-2">
-                            {(brief.top_lead_ids || []).map((leadId, i) => {
-                              const cached = leadId ? leadCache[leadId] : null;
-                              return (
-                                <button
-                                  key={leadId || i}
-                                  onClick={(e) => { e.stopPropagation(); if (leadId) handleLeadClick(leadId); }}
-                                  className="w-full flex items-center gap-3 px-4 py-3 rounded-lg
-                                    bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.12)]
-                                    hover:bg-[rgba(59,130,246,0.12)] hover:border-[rgba(59,130,246,0.25)]
-                                    transition-all duration-150 cursor-pointer text-left group/lead"
-                                >
-                                  <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6] 
-                                    flex items-center justify-center text-xs font-bold font-mono shrink-0">
-                                    {i + 1}
-                                  </span>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-semibold text-[#F1F5F9] group-hover/lead:text-[#3B82F6] transition-colors truncate">
-                                      {cached ? cached.name : `Loading...`}
-                                    </p>
-                                    {cached && (
-                                      <p className="text-xs text-[#64748B] mt-0.5">{cached.city} · Score: {cached.score}</p>
-                                    )}
-                                  </div>
-                                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#64748B] group-hover/lead:text-[#3B82F6] shrink-0">
-                                    <path d="M5 3l4 4-4 4" />
-                                  </svg>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+                      {/* All section content */}
+                      {sections.map((s, i) => {
+                        if (s.type === 'stats') return null; // already rendered above
 
-                      {/* Other Hot Leads */}
-                      {sections.filter(s => s.type === 'header' && s.text === 'Other Hot Leads').length > 0 && (
-                        <div className="mt-5">
-                          <h5 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">Other Hot Leads</h5>
-                          <div className="space-y-1">
-                            {sections.filter(s => s.type === 'bullet').map((s, i) => (
-                              <p key={i} className="text-sm text-[#94A3B8] pl-2 border-l-2 border-[rgba(245,158,11,0.3)]">
-                                {s.text}
-                              </p>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                        if (s.type === 'header') {
+                          if (s.text === 'Leads by Territory') {
+                            return (
+                              <div key={i} className="mt-5">
+                                <h5 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">{s.text}</h5>
+                              </div>
+                            );
+                          }
+                          if (s.text === 'Top Leads to Prioritize') {
+                            return (
+                              <div key={i} className="mt-5">
+                                <h5 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-3">{s.text}</h5>
+                              </div>
+                            );
+                          }
+                          if (s.text === 'Other Hot Leads') {
+                            return (
+                              <div key={i} className="mt-5">
+                                <h5 className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-2">{s.text}</h5>
+                              </div>
+                            );
+                          }
+                          return (
+                            <div key={i} className="mt-4">
+                              <h4 className="text-base font-bold text-[#F1F5F9]">{s.text}</h4>
+                            </div>
+                          );
+                        }
 
-                      {/* Other content */}
-                      {sections.filter(s => s.type === 'other').map((s, i) => (
-                        <p key={i} className="text-sm text-[#94A3B8] mt-3">{s.text}</p>
-                      ))}
+                        if (s.type === 'bullet') {
+                          return (
+                            <p key={i} className="text-sm text-[#94A3B8] pl-2 ml-1 border-l-2 border-[rgba(245,158,11,0.3)] mt-1 leading-relaxed">
+                              {s.text}
+                            </p>
+                          );
+                        }
+
+                        if (s.type === 'lead') {
+                          const idx = sections.filter((x, j) => j < i && (x.type === 'lead' || x.type === 'leadLine')).length;
+                          const leadId = brief.top_lead_ids?.[idx] || null;
+                          const cached = leadId ? leadCache[leadId] : null;
+                          return (
+                            <button
+                              key={i}
+                              onClick={(e) => { e.stopPropagation(); if (leadId) handleLeadClick(leadId); }}
+                              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg
+                                bg-[rgba(59,130,246,0.06)] border border-[rgba(59,130,246,0.12)]
+                                hover:bg-[rgba(59,130,246,0.12)] hover:border-[rgba(59,130,246,0.25)]
+                                transition-all duration-150 cursor-pointer text-left group/lead mt-1.5"
+                            >
+                              <span className="w-6 h-6 rounded-full bg-[rgba(59,130,246,0.15)] text-[#3B82F6]
+                                flex items-center justify-center text-xs font-bold font-mono shrink-0">
+                                {idx + 1}
+                              </span>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-[#F1F5F9] group-hover/lead:text-[#3B82F6] transition-colors truncate">
+                                  {cached ? cached.name : leadId ? 'Loading...' : s.text.split(' — ')[0]}
+                                </p>
+                                {cached && (
+                                  <p className="text-xs text-[#64748B] mt-0.5">{cached.city} · Score: {cached.score}</p>
+                                )}
+                              </div>
+                              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#64748B] group-hover/lead:text-[#3B82F6] shrink-0">
+                                <path d="M5 3l4 4-4 4" />
+                              </svg>
+                            </button>
+                          );
+                        }
+
+                        if (s.type === 'other') {
+                          return (
+                            <p key={i} className="text-sm text-[#94A3B8] mt-2 leading-relaxed">{s.text}</p>
+                          );
+                        }
+
+                        return null;
+                      })}
+
+
 
                       {/* Recommendations */}
                       {brief.recommendations && (
