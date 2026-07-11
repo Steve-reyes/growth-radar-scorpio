@@ -129,9 +129,19 @@ HIGH_HVAC_BUSINESS_TYPES = [
 ]
 
 HOT_HVAC_KEYWORDS = {
+    # Core service providers (Boss's clients)
+    "hvac": 95, "heating": 95, "cooling": 90, "ventilation": 90, "furnace": 95,
+    "air condition": 95, "ac repair": 95, "refrigeration": 85,
+    "roofing": 95, "roof repair": 90, "roofer": 90, "roofing contractor": 90,
+    "electrical": 85, "electrician": 90, "electrical contractor": 85,
+    "plumbing": 85, "plumber": 90, "plumbing contractor": 85, "drain": 75,
+    "mechanical": 80, "mechanical contractor": 80,
+    "contractor": 65, "general contractor": 65, "renovation": 60,
+    "construction": 60, "building contractor": 65,
+    # Commercial properties needing service contracts
     "restaurant": 90, "cafe": 85, "bakery": 80, "kitchen": 90,
     "brewery": 85, "distillery": 80, "catering": 75,
-    "hotel": 85, "motel": 80, "inn": 75,
+    "hotel": 85, "motel": 80, "inn": 75, "hospitality": 75,
     "warehouse": 75, "logistics": 70, "storage": 60,
     "manufacturing": 80, "factory": 80, "industrial": 75,
     "gym": 70, "fitness": 70, "wellness": 55,
@@ -141,14 +151,16 @@ HOT_HVAC_KEYWORDS = {
     "office": 50, "retail": 45, "store": 40,
     "food": 80, "meal": 75, "lunch": 70,
     "laundry": 50, "cleaning": 45,
-    "mechanical": 70, "hvac": 90, "plumbing": 65, "electrical": 60,
-    "contractor": 55, "construction": 55, "renovation": 50,
-    "auto": 55, "repair": 50, "garage": 50,
+    "auto": 55, "repair": 50, "garage": 50, "auto repair": 55,
     "theatre": 60, "cinema": 60, "entertainment": 55,
     "church": 50, "temple": 50, "worship": 50,
     "lawn": 50, "garden": 45, "landscaping": 50,
     "childcare": 55, "preschool": 55,
     "dentist": 55, "optician": 50, "chiropractor": 50,
+    # Related trades
+    "drywall": 60, "painting": 50, "flooring": 50, "carpentry": 55,
+    "paving": 55, "concrete": 55, "masonry": 55, "fencing": 45,
+    "snow removal": 60, "landscaping": 50, "property maintenance": 55,
 }
 
 
@@ -689,7 +701,9 @@ async def ingest_municipal_permits(
     if "burnaby" in city_lower or "richmond" in city_lower:
         return await ingest_vancouver_open_data(db, territory)
 
-    return []
+    # Fallback for all other cities: ISED corporate registry
+    # Gets HVAC/roofing/electrical/plumbing/etc companies registered in the province
+    return await ingest_ised_corporate_fallback(db, territory)
 
 
 async def run_ingestion_for_territory(

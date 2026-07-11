@@ -306,7 +306,7 @@ export default function BriefsPage() {
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#F59E0B]">
                               <path d="M6 1L7.5 4L10.5 4.5L8.5 7L9 10L6 8.5L3 10L3.5 7L1.5 4.5L4.5 4L6 1Z" />
                             </svg>
-                            <h5 className="text-sm font-bold text-[#F59E0B] uppercase tracking-wider">AI Recommendations</h5>
+                            <h5 className="text-sm font-bold text-[#F59E0B] uppercase tracking-wider">Recommendations</h5>
                           </div>
                           <div className="text-sm text-[#94A3B8] leading-relaxed whitespace-pre-wrap">{brief.recommendations}</div>
                         </div>
